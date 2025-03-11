@@ -1,0 +1,53 @@
+{
+    "origin": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+    },
+    "distance": {
+        "x": 6,
+        "y": 6
+    },
+    "symbolToPrefabMap": [
+        {
+            "symbol": "T",
+            "prefabName": "Tree"
+        },
+        {
+            "symbol": "B",
+            "prefabName": "Vine growth 00"
+        },
+        {
+            "symbol": "C",
+            "prefabName": "Vine growth 01"
+        },
+        {
+            "symbol": "D",
+            "prefabName": "Vine growth 02"
+        },
+        {
+            "symbol": "E",
+            "prefabName": "Vine growth 03"
+        },
+        {
+            "symbol": "G",
+            "prefabName": "Vine growth 04"
+        },
+        {
+            "symbol": "H",
+            "prefabName": "Vine growth 05"
+        },
+        {
+            "symbol": "I",
+            "prefabName": "Vine growth 06"
+        },
+        {
+            "symbol": "J",
+            "prefabName": "Vine growth 07"
+        },
+        {
+            "symbol": "A",
+            "prefabName": "Spawner"
+        }
+    ]
+}

@@ -1,0 +1,104 @@
+#pragma kernel CSMain
+
+// Estructura de datos para cada árbol
+struct TreeData
+{
+    float3 position;   // Posición del árbol en el mundo
+    float  attribute;  // Valor de "influencia" o atributo
+};
+
+// Buffer que contendrá la información de los árboles
+StructuredBuffer<TreeData> _Trees;
+
+// Textura de salida para el mapa de calor
+RWTexture2D<float4> Result;
+
+// Parámetros de la textura
+float _TextureWidth;
+float _TextureHeight;
+
+// Parámetros de IDW
+float _Radius;     // Radio máximo de influencia de cada árbol
+float _Exponent;   // Exponente de la fórmula 1/dist^p
+
+// Límites del mundo para mapear (uv -> worldPos)
+// Por ejemplo: (-50, 0, -50) y (50, 0, 50)
+float3 _WorldMin;
+float3 _WorldMax;
+
+[numthreads(8, 8, 1)]
+void CSMain(uint3 id : SV_DispatchThreadID)
+{
+    // 1) Verificamos que el hilo esté dentro de la textura
+    if (id.x >= _TextureWidth || id.y >= _TextureHeight)
+        return;
+
+    // 2) Calculamos la coordenada UV en [0..1]
+    float2 uv = float2(id.x / _TextureWidth, id.y / _TextureHeight);
+
+    // 3) Convertimos UV -> posición en el mundo
+    //    En la mayoría de los casos, y=0 si tu terreno es plano.
+    float3 worldPos = float3(
+        lerp(_WorldMin.x, _WorldMax.x, uv.x),
+        0.0,
+        lerp(_WorldMin.z, _WorldMax.z, uv.y)
+    );
+
+    // Acumuladores para la fórmula IDW
+    float sumWeights = 0.0;
+    float sumValues  = 0.0;
+
+    // 4) Obtenemos la cantidad de árboles
+    uint treeCount = _Trees.Length;
+    if (treeCount == 0)
+    {
+        // Si no hay árboles, pintamos negro este pixel
+        Result[id.xy] = float4(0, 0, 0, 1);
+        return;
+    }
+
+    // 5) Recorremos los árboles y calculamos la influencia (IDW)
+    [loop]
+    for (uint i = 0; i < treeCount; i++)
+    {
+        float3 tPos = _Trees[i].position;
+        float  tVal = _Trees[i].attribute;
+
+        // Distancia desde el pixel (worldPos) hasta el árbol
+        float dist = distance(worldPos, tPos);
+
+        // Si queremos ignorar árboles más lejanos que un radio dado:
+        if (dist > _Radius)
+        {
+            continue;
+        }
+
+        // Evita la división por cero cuando dist es casi 0
+        if (dist < 1e-5)
+        {
+            // Valor grande de peso si está muy cerca del árbol
+            dist = 1e-5;
+        }
+
+        // weight = 1 / (dist^_Exponent)
+        float weight = 1.0 / pow(dist, _Exponent);
+
+        sumWeights += weight;
+        sumValues  += weight * tVal;
+    }
+
+    // 6) Calculamos el "heat" como el promedio ponderado
+    float heat = 0.0;
+    if (sumWeights > 0.0)
+    {
+        heat = sumValues / sumWeights;
+    }
+
+    // 7) Saturamos el valor para que esté entre [0,1]
+    heat = saturate(heat);
+
+    // 8) Asignamos el color en la textura:
+    //    rojo intenso si heat=1, negro si heat=0
+    float4 color = float4(heat, 0.0, 0.0, 1.0);
+    Result[id.xy] = color;
+}
