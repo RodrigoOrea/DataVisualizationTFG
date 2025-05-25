@@ -1,29 +1,21 @@
 using System;
 using System.IO;
-using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using SFB;
-using System.Threading.Tasks;
-using System.Numerics;
-using CesiumForUnity;
 
 public class MenuController : MonoBehaviour
 {
     public static MenuController Instance { get; private set; }
-    public TMP_InputField ipAddress;
-    public TMP_InputField commandPort;
-    public TMP_InputField imagePort;
     public TMP_Dropdown resolution;
 
     public TMP_Dropdown attributes;
     public Toggle fullscreen;
     Resolution[] resolutions;
 
-    ExcelReader excelReader;
 
     [SerializeField] public TMP_InputField urlInputField;
 
@@ -65,64 +57,12 @@ public class MenuController : MonoBehaviour
     public List<GameObject> menus = new List<GameObject>();
 
 
-    /*
-    private string[] ipAddress;
-    private int[] commandPort;
-    private int[] imagePort;
-    private int[] resolutionIndex;
-    private bool[] fullscreen;
 
-    private const int CURRENT = 0;
-    private const int MODIFIED = 1;
-
-    void Awake() {
-        ipAddress = new string[2];
-        commandPort = new int[2];
-        imagePort = new int[2];
-        resolutionIndex = new int[2];
-        fullscreen = new bool[2];
-        PopulateFromPlayerPrefs();
-    }
-    */
-
-    private void displayIfLastSelectedFileExists()
+    private void displayAndSetIfLastSelectedFileExists()
     {
-        // Excel
-        if (File.Exists("lastfileExcel.txt"))
-        {
-            fileExcelPath = File.ReadAllText("lastfileExcel.txt");
-            if (!File.Exists(fileExcelPath))
-            {
-                fileExcelText.color = Color.red;
-                fileExcelText.text = "Could not find selected Excel file " + Path.GetFileName(fileExcelPath);
-            }
-            else
-            {
-                fileExcelText.color = Color.black;
-                fileExcelText.text = "Last selected Excel file: " + Path.GetFileName(fileExcelPath);
-            }
-        }
-        else {
-            fileExcelText.text = "No selected Excel file";
-        }
-        // KML
-        if (File.Exists("lastfileKML.txt"))
-        {
-            fileKMLPath = File.ReadAllText("lastfileKML.txt");
-            if (!File.Exists(fileKMLPath))
-            {
-                fileKMLText.color = Color.red;
-                fileKMLText.text = "Could not find last selected KML file" + Path.GetFileName(fileKMLPath);
-            }
-            else
-            {
-                fileKMLText.color = Color.black;
-                fileKMLText.text = "Last selected KML file: " + Path.GetFileName(fileKMLPath);
-            }
-        }
-        else {
-            fileKMLText.text = "No selected KML file";
-        }
+        fileExcelText.text = ExcelRepresentation.Instance.getFileString();
+        fileKMLText.text = KMLRepresentation.Instance.getFileString();
+
     }
 
     private void Awake()
@@ -137,9 +77,7 @@ public class MenuController : MonoBehaviour
             Destroy(gameObject);
         }
         errorColorText = Color.red;
-        //normalColorText = commandPort.colors.selectedColor;
-        //saveColorBg = save.image.color;
-        displayIfLastSelectedFileExists();
+        displayAndSetIfLastSelectedFileExists();
     }
 
     private void Start()
@@ -150,32 +88,10 @@ public class MenuController : MonoBehaviour
 
     private void Update()
     {
-        //bool errors = false;
-        //errors |= CheckPortText(xmppPort);
-        //UpdateSaveButton(errors);
+
     }
 
-    private void UpdateSaveButton(bool errors)
-    {
-        save.enabled = !errors;
-        if (errors)
-            save.image.color = Color.gray;
-        else
-            save.image.color = saveColorBg;
-    }
 
-    /* private bool CheckPortText(TMP_InputField control) {
-        bool error = false;
-        if (!AllNumbers(control.text))
-            error = true;
-        else {
-            var value = int.Parse(control.text);
-            if (value < 1 || value > 65535)
-                error = true;
-        } 
-        ChangeColorOnError(control, error);
-        return error;
-    } */
 
     private void ChangeColorOnError(TMP_InputField control, bool error)
     {
@@ -193,13 +109,6 @@ public class MenuController : MonoBehaviour
         control.colors = colors;
     }
 
-    private bool AllNumbers(string text)
-    {
-        bool result = true;
-        for (int i = 0; i < text.Length && result; i++)
-            result &= char.IsDigit(text[i]);
-        return result;
-    }
 
     private void PopulateResolutionDropdown()
     {
@@ -293,56 +202,10 @@ public class MenuController : MonoBehaviour
             Warning("Error durante el inicio de la simulación virtual: " + ex.Message);
         }
     }
-    /* private void PopulateAttributesDropdown(){
-    // Limpiar las opciones existentes del Dropdown
-        attributes.ClearOptions();
-
-        ExcelReader excelReader = gameObject.AddComponent<ExcelReader>();
-        // Obtenemos la lista de diccionarios desde el Excel
-        List<Dictionary<string, string>> treeDataList = excelReader.ReadExcelData();
-
-        // Lista para almacenar las claves del primer diccionario
-        List<string> firstElementKeys = new List<string>();
-
-        // Verificamos que haya al menos un elemento en la lista
-        if (treeDataList != null && treeDataList.Count > 0)
-        {
-            // Obtenemos el primer diccionario
-            Dictionary<string, string> firstDict = treeDataList[0];
-
-            // Agregamos todas las claves del primer diccionario a la lista
-            foreach (string key in firstDict.Keys)
-            {
-                firstElementKeys.Add(key);
-            }
-        }
-
-        // Añadimos las claves al Dropdown como opciones
-        attributes.AddOptions(firstElementKeys);
-
-        // Opcionalmente, establecemos el valor por defecto en la primera opción
-        attributes.value = 0;
-
-        // Refrescamos para mostrar el valor actual
-        attributes.RefreshShownValue();
-    } */
 
 
     public static void Warning(string message)
     {
-        // if (Instance == null)
-        // {
-        //     Debug.LogError("MenuController not initialized.");
-        //     return;
-        // }
-
-        // GameObject warningGO = Instantiate(Instance.warningMessagePrefab, Instance.canvasTransform);
-        // var ui = warningGO.GetComponent<WarningMessageUI>();
-        // if (ui != null)
-        // {
-        //     ui.SetMessage(message);
-        // }
-
         if (Instance != null && Instance.warningText != null)
         {
             Instance.warningText.text = message;
@@ -356,21 +219,16 @@ public class MenuController : MonoBehaviour
 
     public void SelectLocalExcelFile()
     {
-        // Abre el explorador de archivos para seleccionar un archivo Excel
         string[] paths = StandaloneFileBrowser.OpenFilePanel("Selecciona un archivo XLSX", "", "xlsx", false);
 
         if (paths.Length > 0 && !string.IsNullOrEmpty(paths[0]))
         {
             fileExcelPath = paths[0];
-
             try
             {
-                // Guardar ruta en archivo persistente
-                File.WriteAllText("lastfileExcel.txt", fileExcelPath);
-
-                // Actualizar la interfaz
+                ExcelRepresentation.Instance.setExcel(fileExcelPath);
                 fileExcelText.color = Color.black;
-                fileExcelText.text = "Selected file: " + Path.GetFileName(fileExcelPath);
+                fileExcelText.text = ExcelRepresentation.Instance.getFileString();
                 Debug.Log("Archivo Excel seleccionado: " + fileExcelPath);
             }
             catch (Exception ex)
@@ -400,9 +258,9 @@ public class MenuController : MonoBehaviour
             if (!string.IsNullOrEmpty(downloadedFilePath))
             {
                 fileExcelPath = downloadedFilePath;
+                ExcelRepresentation.Instance.setExcel(fileExcelPath);
                 fileExcelText.color = Color.black;
-                fileExcelText.text = "Archivo descargado: " + Path.GetFileName(fileExcelPath);
-                File.WriteAllText("lastfileExcel.txt", fileExcelPath);
+                fileExcelText.text = ExcelRepresentation.Instance.getFileString();
                 Debug.Log("Archivo Excel descargado desde URL: " + fileExcelPath);
             }
             else
@@ -425,15 +283,11 @@ public class MenuController : MonoBehaviour
         if (paths.Length > 0 && !string.IsNullOrEmpty(paths[0]))
         {
             fileKMLPath = paths[0];
-
             try
             {
-                // Guardar la ruta del archivo para persistencia
-                File.WriteAllText("lastfileKML.txt", fileKMLPath);
-
-                // Mostrar en la interfaz
+                KMLRepresentation.Instance.setKML(fileKMLPath);
                 fileKMLText.color = Color.black;
-                fileKMLText.text = "Selected file: " + Path.GetFileName(fileKMLPath);
+                fileKMLText.text = KMLRepresentation.Instance.getFileString();
                 Debug.Log("Archivo KML seleccionado: " + fileKMLPath);
             }
             catch (Exception ex)
@@ -463,9 +317,9 @@ public class MenuController : MonoBehaviour
             if (!string.IsNullOrEmpty(downloadedFilePath))
             {
                 fileKMLPath = downloadedFilePath;
+                KMLRepresentation.Instance.setKML(fileKMLPath);
                 fileKMLText.color = Color.black;
-                fileKMLText.text = "Archivo descargado: " + Path.GetFileName(fileKMLPath);
-                File.WriteAllText("lastfileKML.txt", fileKMLPath);
+                fileKMLText.text = KMLRepresentation.Instance.getFileString();
                 Debug.Log("Archivo KML descargado desde URL: " + fileKMLPath);
             }
             else

@@ -23,9 +23,9 @@ public class FilterMenu : MonoBehaviour
         Instance = this;
 
         //todo esto debería leerse solo una vez, tambien se lee en MapLoader
-        List<Dictionary<string, string>> treeDataList = ExcelReader.ReadExcelData(MenuController.Instance.fileExcelPath, MenuController.Instance.excelSheetIndex);
-        Dictionary<string, string> firstDict = treeDataList[0];
-        List<string> attributeKeys = firstDict.Keys.ToList();
+        List<Dictionary<string, string>> treeDataList = ExcelRepresentation.Instance.attributes;
+        Dictionary<string, string> firstDict = treeDataList.Count > 0 ? treeDataList[0] : new Dictionary<string, string>();
+        List<string> attributeKeys = new List<string>(firstDict.Keys);
 
 
         int i = 0;

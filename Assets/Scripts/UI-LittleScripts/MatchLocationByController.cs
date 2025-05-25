@@ -13,7 +13,7 @@ public class MatchLocationByController : MonoBehaviour
     {
         
         // Leer los datos del Excel
-        treeDataList = ExcelReader.ReadExcelData(MenuController.Instance.fileExcelPath, MenuController.Instance.excelSheetIndex);
+        treeDataList = ExcelRepresentation.Instance.getAttributes();
         
         // Poblar el dropdown
         PopulateDropdown();

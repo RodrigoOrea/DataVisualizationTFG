@@ -4,9 +4,8 @@ using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
 using UnityEngine;
 
-public class ExcelReader
+public static class ExcelReader
 {
-    public string excelFilePath = MenuController.Instance.fileExcelPath;
 
     public static List<Dictionary<string, string>> ReadExcelData(string excelFilePath, int sheetIndex = 0)
     {
@@ -73,10 +72,12 @@ public class ExcelReader
         catch (System.IO.FileNotFoundException ex)
         {
             ErrorHandler.Instance.LogErrorLoad("Could not find the file: " + ex.FileName);
+            Debug.LogError("File not found: " + ex.FileName);
         }
         catch (System.ArgumentException)
         {
             ErrorHandler.Instance.LogErrorNoFile("Excel");
+            Debug.LogError("Invalid file path or file type. Please check the file path and ensure it is a valid Excel file.");
         }
 
         return dataList;

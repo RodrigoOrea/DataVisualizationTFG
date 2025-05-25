@@ -66,9 +66,7 @@ public class UIManager : MonoBehaviour
             Destroy(gameObject);
         }
 
-        treeDataList = ExcelReader.ReadExcelData(MenuController.Instance.fileExcelPath, MenuController.Instance.excelSheetIndex);
-        //treeDataList = MapSceneController.Instance.treeDataList;
-
+        treeDataList = ExcelRepresentation.Instance.attributes;
         if (treeDataList != null && treeDataList.Count > 0)
         {
             Dictionary<string, string> firstDict = treeDataList[0];

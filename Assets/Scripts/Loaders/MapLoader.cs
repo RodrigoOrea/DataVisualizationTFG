@@ -27,7 +27,6 @@ public class MapLoader : MonoBehaviour
     private Dictionary<string, GameObject> prefabs;
     private Dictionary<string, GameObject> spawners;
 
-    private ExcelReader excelReader;
 
     public List<Dictionary<string, string>> treeDataList;
 
@@ -46,7 +45,7 @@ public class MapLoader : MonoBehaviour
         textureLoader = new TextureLoader();
         spawners = new Dictionary<string, GameObject>();
         prefabs = PopulateInstantiablePrefabs(instantiablePrefabs);
-        objects = LoadMapFileInfo(mapFileName, configFileName);
+        //objects = LoadMapFileInfo(mapFileName, configFileName);
         PlaceLightsAndObjects(objects, prefabs);
         //LoadExcelData();
         //AssignAttributesToObjects();
@@ -127,50 +126,6 @@ public class MapLoader : MonoBehaviour
             }
         }
     }*/
-    private InfoCollection LoadMapFileInfo(string filename, string mapConfigFilename) {
-        string editorExtension = ".txt";
-        string resultExtension = ".json";
-        string mapConfigFullFilename = mapConfigFilename + ".json";
-        if (!File.Exists(mapConfigFullFilename))
-            GenerateDefaultMapConfigFile(mapConfigFullFilename);
-        if (File.Exists(filename + editorExtension)) {
-            GenerateJsonFromEditor(filename + editorExtension, mapConfigFullFilename);
-        } else {
-            if (!File.Exists(filename + resultExtension))
-                return GenerateDefaultTemplate(filename + resultExtension);
-        }
-        return ReadMapFile(filename + resultExtension);
-    }
-
-    private void GenerateJsonFromEditor(string filename, string mapConfigFilename) {
-        MapConfiguration mapConfiguration = ReadMapConfigFile(mapConfigFilename);
-        int spawnerCounter = 0;
-        float currentX = mapConfiguration.origin.x;
-        float currentY = mapConfiguration.origin.y;
-        float currentZ = mapConfiguration.origin.z;
-        float maxX = 0;
-        Origin_map = mapConfiguration.origin; //To use in cenital camera
-        IEnumerable<string> lines = File.ReadLines(filename);
-        foreach (string line in lines) {
-            char[] chars = line.ToCharArray();
-            foreach (char c in chars) {
-                if (c != ' ') {
-                    var pos = new Vector3(currentX, currentY, currentZ);
-                    InstantiateSymbol(mapConfiguration.SymbolToPrefabMapping, c, pos, ref spawnerCounter);
-                    //objectsSpawned++;
-                }
-                currentX += mapConfiguration.distance.x;
-                
-            }
-            if (currentX> maxX)
-                maxX = currentX;
-            currentX = mapConfiguration.origin.x;
-            currentZ += mapConfiguration.distance.y;
-             
-        }
-        End_map.x = maxX;
-        End_map.z = currentZ;
-    }
 
     private void InstantiateSymbol(Dictionary<string, SymbolPrefabPair> symbolToPrefabMapping, char symbol, Vector3 pos, ref int spawnerCounter) {
         ObjectInfo instantiable = new ObjectInfo {
@@ -183,20 +138,6 @@ public class MapLoader : MonoBehaviour
         if (instantiable.objectPrefabName.Equals("Spawner"))
             instantiable.objectName += " " + ++spawnerCounter;
         PlaceObject(instantiable, prefabs);
-    }
-
-    private void GenerateDefaultMapConfigFile(string filename, bool prettyPrint = true) {
-        MapConfiguration mapConfig = new MapConfiguration {
-            distance = new Vector2(1.2f, 1.2f)
-        };
-        mapConfig.SymbolToPrefabMapping = new Dictionary<string, SymbolPrefabPair> {
-            { "T", new SymbolPrefabPair { symbol = "T", prefabName = "Tree" } },
-            { "A", new SymbolPrefabPair { symbol = "A", prefabName = "Spawner" } },
-            { "F", new SymbolPrefabPair { symbol = "F", prefabName = "Tree Fruit Variant" } },
-        };
-        mapConfig.ArrayLetterToPrefabMapping();
-        string json = JsonUtility.ToJson(mapConfig, prettyPrint);
-        File.WriteAllText(filename, json);
     }
 
     private void PlaceLightsAndObjects(InfoCollection infoCollection, Dictionary<string, GameObject> prefabs) {
@@ -267,12 +208,6 @@ public class MapLoader : MonoBehaviour
         return JsonUtility.FromJson<InfoCollection>(json);
     }
 
-    private MapConfiguration ReadMapConfigFile(string filename) {
-        string json = File.ReadAllText(filename);
-        var mapConfiguration = JsonUtility.FromJson<MapConfiguration>(json);
-        mapConfiguration.InitLetterToPrefabMapping();
-        return mapConfiguration;
-    }
 
     private InfoCollection GenerateDefaultTemplate(string filename, bool prettyPrint = true) {
         LightInfo[] lightInfos = {

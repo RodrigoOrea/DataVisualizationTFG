@@ -48,7 +48,7 @@ public class MapSceneController : MonoBehaviour
         _cesiumGeoreference.MoveOrigin();
         Camera.main.transform.localPosition = Vector3.zero;
 
-        treeDataList = ExcelReader.ReadExcelData(MenuController.Instance.fileExcelPath, MenuController.Instance.excelSheetIndex);
+        treeDataList = ExcelRepresentation.Instance.attributes;
 
         if (treeDataList == null || treeDataList.Count == 0)
         {

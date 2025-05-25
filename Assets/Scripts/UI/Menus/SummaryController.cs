@@ -18,13 +18,13 @@ public class SummaryController : MonoBehaviour
     void OnEnable()
     {
         Debug.Log("SummaryController OnEnable");
-        excelFilePathText.text = Path.GetFileName(MenuController.Instance.fileExcelPath);
+        excelFilePathText.text = Path.GetFileName(ExcelRepresentation.Instance.path);
         kmlFileNameText.text = Path.GetFileName(MenuController.Instance.fileKMLPath);
-        PopulateSheets(MenuController.Instance.fileExcelPath);
+        PopulateSheets(ExcelRepresentation.Instance.path);
         sheetDropdown.onValueChanged.AddListener(OnSheetSelected);
 
         CheckIfFileExists(MenuController.Instance.fileKMLPath, "KML");
-        CheckIfFileExists(MenuController.Instance.fileExcelPath, "Excel");
+        CheckIfFileExists(ExcelRepresentation.Instance.path, "Excel");
         PopulateMatchLocationDropdown();
     }
 
@@ -79,7 +79,7 @@ public class SummaryController : MonoBehaviour
     private void PopulateMatchLocationDropdown()
     {
         if (matchLocationDropdown == null) return;
-        matchLocationTreeDataList = ExcelReader.ReadExcelData(MenuController.Instance.fileExcelPath, MenuController.Instance.excelSheetIndex);
+        matchLocationTreeDataList = ExcelRepresentation.Instance.attributes;
         matchLocationDropdown.ClearOptions();
         if (matchLocationTreeDataList == null || matchLocationTreeDataList.Count == 0)
         {

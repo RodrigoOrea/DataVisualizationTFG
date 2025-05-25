@@ -5,11 +5,12 @@ using UnityEngine;
 public class TreeManager : MonoBehaviour
 {
     public List<GameObject> prefabList; // Lista de prefabs (e.g., "Tree1", "Tree2")
-    public ExcelReader excelReader;
 
     private void Start()
     {
-        List<Dictionary<string, string>> treeDataList = ExcelReader.ReadExcelData(MenuController.Instance.fileExcelPath, MenuController.Instance.excelSheetIndex);
+        var attributeKeys = ExcelRepresentation.Instance.getAttributes();
+        List<Dictionary<string, string>> treeDataList = ExcelRepresentation.Instance.attributes;
+        if (treeDataList == null) treeDataList = new List<Dictionary<string, string>>();
 
         foreach (Dictionary<string, string> treeData in treeDataList)
         {
@@ -41,10 +42,10 @@ public class TreeManager : MonoBehaviour
                 GameObject treeInstance = Instantiate(prefab, position, Quaternion.identity);
 
                 // Asignar atributos dinámicos al TreeAttributes del prefab
-                TreeAttributes attributes = treeInstance.GetComponent<TreeAttributes>();
-                if (attributes != null)
+                TreeAttributes treeAttributes = treeInstance.GetComponent<TreeAttributes>();
+                if (treeAttributes != null)
                 {
-                    attributes.SetAttributes(treeData);
+                    treeAttributes.SetAttributes(treeData);
                 }
                 else
                 {
