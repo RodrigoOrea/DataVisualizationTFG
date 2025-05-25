@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Barra Roja → Azul</title>
+  <style>
+    .container {
+      width: 400px;
+      margin: 20px auto;
+      font-family: sans-serif;
+      text-align: center;
+    }
+
+    /*
+      Barra con dos tramos:
+       - Rojo claro (#FFC0C0) a rojo oscuro (#FF0000) [0%-49%]
+       - Azul oscuro (#0066FF) a azul claro (#CCE6FF) [51%-100%]
+       => El salto se produce cerca del 50% (average).
+    */
+    .color-bar {
+      width: 100%;
+      height: 30px;
+      background: linear-gradient(
+        to right,
+        /* min → average */
+        #FFC0C0 0%,    /* rojo claro */
+        #FF0000 49%,   /* rojo oscuro */
+
+        /* Salto en el average (~50%) */
+        #0066FF 51%,   /* azul oscuro */
+        #CCE6FF 100%   /* azul claro (suave) */
+      );
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      position: relative;
+      margin-bottom: 10px;
+    }
+
+    .labels {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 5px;
+    }
+
+    .attribute-name {
+      margin: 0 10px;
+      flex: 1;
+      text-align: center;
+      font-weight: bold;
+    }
+
+    /* Marca visual para indicar la posición de "average" en la barra */
+    .marker {
+      position: absolute;
+      top: -5px;
+      left: 50%; /* a mitad de la barra */
+      transform: translateX(-50%);
+      width: 2px;
+      height: 40px;
+      background-color: #333;
+      opacity: 0.5;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="color-bar">
+      <!-- Marca en el 50% para simular "average" -->
+      <div class="marker"></div>
+    </div>
+    <div class="labels">
+      <span>min (rojo suave)</span>
+      <span class="attribute-name">Atributo</span>
+      <span>max (azul suave)</span>
+    </div>
+    <p style="font-size: 0.85em; color: #555;">
+      Aquí se muestra un salto aproximado en el 50%. 
+      En tu código de Unity, la posición real del “average” 
+      podría no ser exactamente la mitad, sino donde corresponda 
+      al valor medio en [min, max].
+    </p>
+  </div>
+</body>
+</html>
