@@ -33,7 +33,6 @@ public class MenuController : MonoBehaviour
 
     private Color normalColorText;
     private Color errorColorText;
-    private Color saveColorBg;
 
     public bool byClick = false;
 

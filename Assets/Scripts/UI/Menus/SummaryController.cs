@@ -23,8 +23,8 @@ public class SummaryController : MonoBehaviour
         PopulateSheets(ExcelRepresentation.Instance.path);
         sheetDropdown.onValueChanged.AddListener(OnSheetSelected);
 
-        CheckIfFileExists(MenuController.Instance.fileKMLPath, "KML");
         CheckIfFileExists(ExcelRepresentation.Instance.path, "Excel");
+        CheckIfFileExists(KMLRepresentation.Instance.path, "KML");
         PopulateMatchLocationDropdown();
     }
 

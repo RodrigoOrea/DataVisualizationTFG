@@ -26,7 +26,10 @@ public class ExcelRepresentation : Singleton<ExcelRepresentation>
             }
         }
         if (string.IsNullOrEmpty(effectivePath) || !System.IO.File.Exists(effectivePath))
+        {
             return "No Excel selected file";
+        }
+        setExcel(effectivePath);
         return System.IO.Path.GetFileName(effectivePath);
     }
 

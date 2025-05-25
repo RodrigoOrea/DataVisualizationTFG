@@ -24,6 +24,7 @@ public class KMLRepresentation : Singleton<KMLRepresentation>
         }
         if (string.IsNullOrEmpty(effectivePath) || !System.IO.File.Exists(effectivePath))
             return "No selected file";
+        setKML(effectivePath);
         return System.IO.Path.GetFileName(effectivePath);
     }
 }

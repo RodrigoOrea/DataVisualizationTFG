@@ -12,7 +12,7 @@ public class ButtonTooltip : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
     private void Start()
     {
         // Busca el TooltipHandler en la escena
-        tooltipHandler = FindObjectOfType<TooltipHandler>();
+        tooltipHandler = FindFirstObjectByType<TooltipHandler>();
     }
 
     public void OnPointerEnter(PointerEventData eventData)
