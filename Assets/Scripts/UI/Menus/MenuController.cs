@@ -11,11 +11,8 @@ public class MenuController : MonoBehaviour
 {
     public static MenuController Instance { get; private set; }
     public TMP_Dropdown resolution;
-
-    public TMP_Dropdown attributes;
     public Toggle fullscreen;
     Resolution[] resolutions;
-
 
     [SerializeField] public TMP_InputField urlInputField;
 
@@ -32,20 +29,12 @@ public class MenuController : MonoBehaviour
     [SerializeField] private Button save;
 
     private Color normalColorText;
-    private Color errorColorText;
 
-    public bool byClick = false;
+    private Color errorColorText;
 
     public List<GameObject> instantiatedToggles;
 
-    [SerializeField] public GameObject filterMenu;
-
-    [SerializeField] public GameObject Canvas;
-
     public string selectedKey;
-
-    [SerializeField] private GameObject warningMessagePrefab;
-    [SerializeField] private Transform canvasTransform; // Lugar donde instanciar (Canvas)
 
     public TMP_Text warningText;
 
@@ -152,23 +141,20 @@ public class MenuController : MonoBehaviour
     {
         Screen.fullScreen = fullscreen;
     }
+
+    //inspector
     public void StartSimulatorSatelital()
     {
         try
         {
-            if (string.IsNullOrEmpty(fileExcelPath) || string.IsNullOrEmpty(fileKMLPath))
+            if (string.IsNullOrEmpty(ExcelRepresentation.Instance.path) || string.IsNullOrEmpty(KMLRepresentation.Instance.path))
             {
                 Warning("Para la vista satelital necesitas:\n\n- Un archivo .kml para representar los cultivos vía vista satelital.\n- Un archivo .xlsx para asociar cada árbol con sus atributos.");
                 return;
             }
 
-            Debug.Log("Processing KML file: " + fileKMLPath);
-            double[] coords = KMLParser.GetCoordinatesFromSpawn(fileKMLPath);
-            double[] coordsEFEC = CoordinateConverter.GeodeticToEcef(coords);
-            GeneralData.coords = coordsEFEC;
-            GeneralData.coordenadas = KMLParser.ParseKml(fileKMLPath);
+            MapConfiguration.Instance.setConfiguration();
 
-            Debug.Log("Starting satelital view simulation");
             SceneManager.LoadScene("Mapa");
             gameObject.SetActive(false);
             isCesium = true;
@@ -179,7 +165,7 @@ public class MenuController : MonoBehaviour
             Warning("Error durante el inicio de la simulación satelital: " + ex.Message);
         }
     }
-
+    //inspector
     public void StartSimulatorVirtual()
     {
         try
@@ -215,7 +201,7 @@ public class MenuController : MonoBehaviour
         }
 
     }
-
+    //inspector
     public void SelectLocalExcelFile()
     {
         string[] paths = StandaloneFileBrowser.OpenFilePanel("Selecciona un archivo XLSX", "", "xlsx", false);
@@ -240,7 +226,7 @@ public class MenuController : MonoBehaviour
             Debug.LogWarning("No se seleccionó ningún archivo.");
         }
     }
-
+    //inspector
     public async void SelectURLExcelFile()
     {
         string url = urlInputField.text.Trim();
@@ -273,7 +259,7 @@ public class MenuController : MonoBehaviour
         }
     }
 
-
+    //inspector
     public void SelectLocalKMLFile()
     {
         // Abre el explorador de archivos para seleccionar un archivo KML
@@ -300,6 +286,7 @@ public class MenuController : MonoBehaviour
         }
     }
 
+    //inspector
     public async void SelectURLKMLFile()
     {
         string url = urlInputField.text.Trim();

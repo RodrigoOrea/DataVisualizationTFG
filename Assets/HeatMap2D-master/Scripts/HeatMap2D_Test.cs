@@ -251,9 +251,9 @@ namespace HeatMap2D
 			Debug.Log($"Calculated intensity: {intensity}");
 			heatmap.Intensity = intensity; // Set to 100 for testing purposes
 
-			Debug.Log($"Processing {MapSceneController.Instance.instantiatedPrefabs.Count} trees");
+			Debug.Log($"Processing {MapSceneController.Instance.InstantiatedPrefabs.Count} trees");
 			int treeCount = 0;
-        	foreach(GameObject Tree in MapSceneController.Instance.instantiatedPrefabs){
+        	foreach(GameObject Tree in MapSceneController.Instance.InstantiatedPrefabs){
 				if (Tree == null) {
 					Debug.LogWarning($"Found null tree at index {treeCount}");
 					continue;

@@ -19,7 +19,7 @@ public class SummaryController : MonoBehaviour
     {
         Debug.Log("SummaryController OnEnable");
         excelFilePathText.text = Path.GetFileName(ExcelRepresentation.Instance.path);
-        kmlFileNameText.text = Path.GetFileName(MenuController.Instance.fileKMLPath);
+        kmlFileNameText.text = Path.GetFileName(KMLRepresentation.Instance.path);
         PopulateSheets(ExcelRepresentation.Instance.path);
         sheetDropdown.onValueChanged.AddListener(OnSheetSelected);
 

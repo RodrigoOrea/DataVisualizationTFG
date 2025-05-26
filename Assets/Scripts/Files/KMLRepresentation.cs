@@ -5,9 +5,15 @@ public class KMLRepresentation : Singleton<KMLRepresentation>
     public string path;
     public List<Dictionary<string, string>> attributes;
 
+    public double[] coordinatesFromSpawn;
+
+    public Dictionary<string, List<(double Latitude, double Longitude, double Altitude)>> placemarkCoordinates;
+
     public void setKML(string path)
     {
         this.path = path;
+        this.coordinatesFromSpawn = KMLParser.GetCoordinatesFromSpawn(path);
+        this.placemarkCoordinates = KMLParser.ParseKml(path);
         System.IO.File.WriteAllText("lastfileKML.txt", path);
     }
 

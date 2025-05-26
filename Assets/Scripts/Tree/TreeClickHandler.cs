@@ -22,10 +22,13 @@ public class TreeClickHandler : MonoBehaviour
                 // ¿El objeto golpeado es este?
                 if (hitInfo.collider.gameObject == this.gameObject)
                 {
+                    ProgressBar bar = this.gameObject.GetComponent<ProgressBar>();
                     if (panel.panelInstance.activeSelf)
                     {
                         // Ocultar la info
                         if (panel != null) panel.HidePanel();
+                        bar.HideBar();
+
                     }
                     else
                     {
@@ -36,10 +39,12 @@ public class TreeClickHandler : MonoBehaviour
                         if (UIManager.Instance.selectedAttributeBoolean)
                         {
                             String currentSelectedAttribute = UIManager.Instance.selectedAttributeString;
-                            (float min, float max, float avg) Stats = MapLoader.Instance.CalculateStats(currentSelectedAttribute);
+                            (float min, float max, float avg) Stats = MapManager.Instance.CalculateStats(currentSelectedAttribute);
                             float value = this.gameObject.GetComponent<TreeAttributes>().GetValue(currentSelectedAttribute);
-                            UIManager.Instance.currentText.GetComponent<TMP_Text>().text = "Current-" + Math.Round(value, 4).ToString();
+                            //UIManager.Instance.currentText.GetComponent<TMP_Text>().text = "Current-" + Math.Round(value, 4).ToString();
                             BarScript.instance.UpdateIndicator(Stats.min, Stats.max, value);
+                            bar.UpdateProgressBar(currentSelectedAttribute, Stats);
+                            bar.ShowBar();
                         }
                     }
                 }
