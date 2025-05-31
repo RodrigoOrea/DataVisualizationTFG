@@ -111,17 +111,57 @@ public class MapManager : MonoBehaviour
         return (minVal, maxVal, avgVal);
     }
 
-    public void ApplyFilters(List<(string key, string value)> criteria)
+    public void ApplyFilters(List<FilterCriteria> filters)
+{
+    foreach (var tree in MapSceneController.Instance.InstantiatedPrefabs)
     {
-        foreach (var tree in MapLoader.Instance.instantiatedPrefabs)
+        if (tree == null) continue;
+
+        var attr = tree.GetComponent<TreeAttributes>();
+        if (attr == null)
         {
-            if (tree == null) continue;
-            var attr = tree.GetComponent<TreeAttributes>();
-            //bool visible = criteria.All(c =>
-                //attr.attributes.TryGetValue(c.key, out var val) &&
-                //string.Equals(val, c.value, System.StringComparison.OrdinalIgnoreCase)
-            //);
-            //tree.SetActive(visible);
+            Debug.LogWarning($"Tree {tree.name} no tiene componente TreeAttributes.");
+            tree.SetActive(false);
+            continue;
         }
+
+        // Convertimos atributos a diccionario
+        Dictionary<string, float> attributeDict = new Dictionary<string, float>();
+        foreach (var pair in attr.attributes)
+        {
+            if (float.TryParse(pair.Value, System.Globalization.NumberStyles.Float,
+                               System.Globalization.CultureInfo.InvariantCulture, out float parsed))
+            {
+                attributeDict[pair.Key] = parsed;
+            }
+            else
+            {
+                Debug.LogWarning($"No se pudo parsear el valor '{pair.Value}' del atributo '{pair.Key}' en {tree.name}.");
+            }
+        }
+
+        // Evaluar filtros
+        bool allPassed = true;
+        foreach (var filter in filters)
+        {
+            bool passed = filter.Evaluate(attributeDict);
+            if (!passed)
+            {
+                Debug.Log($"Tree {tree.name} FAILS filter: {filter}");
+                allPassed = false;
+                break; // con que falle uno basta
+            }
+        }
+
+        if (allPassed)
+        {
+            Debug.Log($"Tree {tree.name} PASSES all filters.");
+        }
+
+        tree.SetActive(allPassed);
     }
+}
+
+
+
 }

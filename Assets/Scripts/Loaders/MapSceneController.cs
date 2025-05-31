@@ -23,6 +23,12 @@ public class MapSceneController : MonoBehaviour
     private Dictionary<string, Dictionary<string, string>> treeDataDict;
     private List<Dictionary<string, string>> treeDataList;
 
+    public GameObject spawnBeacon;
+
+    public GameObject dynamicCamera;
+
+
+
     private void Awake()
     {
         // Singleton setup
@@ -81,8 +87,15 @@ public class MapSceneController : MonoBehaviour
                     {
                         heatMap.name = "HeatMap_Spawn";
                         SetAnchorPosition(heatMap, coord);
+                        SetAnchorPosition(spawnBeacon, coord);
+                        SetAnchorPosition(dynamicCamera, coord);
+
                         StartCoroutine(FindIntersection(heatMap));
+                        StartCoroutine(FindIntersection(spawnBeacon));
+                        StartCoroutine(FindIntersection(dynamicCamera, new Vector3(0, 5, 0)));
+
                         StartCoroutine(PositionOverviewCamera(heatMap));
+
                     }
                     else
                     {
@@ -130,7 +143,7 @@ public class MapSceneController : MonoBehaviour
         }
     }
 
-    private IEnumerator FindIntersection(GameObject obj)
+    private IEnumerator FindIntersection(GameObject obj, UnityEngine.Vector3 offset = default)
     {
         Vector3 position = obj.transform.position;
 
@@ -139,7 +152,7 @@ public class MapSceneController : MonoBehaviour
             Ray ray = new Ray(position, Vector3.down);
             if (Physics.Raycast(ray, out RaycastHit hit, 2000f))
             {
-                obj.transform.position = hit.point;
+                obj.transform.position = hit.point + offset;
                 yield break;
             }
             yield return new WaitForSeconds(1f);

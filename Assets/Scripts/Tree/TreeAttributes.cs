@@ -112,6 +112,6 @@ public class TreeAttributes : MonoBehaviour
     }
     // Si no lo encuentra o no se puede parsear, regresa 0 u otro valor por defecto
     return 0f;
-}
+    }
 }
 

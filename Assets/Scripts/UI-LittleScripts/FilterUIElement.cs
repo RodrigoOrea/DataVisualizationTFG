@@ -36,14 +36,4 @@ public class FilterUIElement : MonoBehaviour
         }
     }
 
-    public FilterCriteria GetFilterCriteria()
-    {
-        string attribute = attributeDropdown.options[attributeDropdown.value].text;
-        string inputValue = valueInput.text;
-
-        if (string.IsNullOrEmpty(attribute) || string.IsNullOrEmpty(inputValue))
-            return null;
-
-        return new FilterCriteria(attribute, inputValue);
-    }
 }
