@@ -1,0 +1,18 @@
+{
+    "asset": "88e56632cb9e08f4fa1e2039041fac3e",
+    "fileName": "01972c95-f4cf-7b62-a573-3c731a17eaaf.jpg",
+    "prompt": "Just change this image so I can use it as a canvas background, no other change",
+    "negativePrompt": "",
+    "model": "4dc55660-f3eb-42ba-93a4-6261d6b2b8ec",
+    "customSeed": -1,
+    "refinementMode": "Generation",
+    "pixelateTargetSize": 0,
+    "pixelateKeepImageSize": false,
+    "pixelatePixelBlockSize": 0,
+    "pixelateMode": 0,
+    "pixelateOutlineThickness": 0,
+    "doodles": {
+        "m_Items": []
+    },
+    "upscaleFactor": 0
+}
