@@ -3,7 +3,6 @@ using System.Collections.Generic;
 public class KMLRepresentation : Singleton<KMLRepresentation>
 {
     public string path;
-    public List<Dictionary<string, string>> attributes;
 
     public double[] coordinatesFromSpawn;
 

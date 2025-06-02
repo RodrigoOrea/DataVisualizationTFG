@@ -10,7 +10,7 @@
 		Tags { "Queue" = "Transparent" }
 		Blend SrcAlpha OneMinusSrcAlpha
 		ZWrite Off
-		ZTest Always
+		ZTest LEqual
 
 		Pass
 		{

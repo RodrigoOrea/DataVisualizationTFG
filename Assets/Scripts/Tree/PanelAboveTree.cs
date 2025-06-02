@@ -11,7 +11,7 @@ public class PanelAboveTree : MonoBehaviour
     private RectTransform panelRectTransform;
     private TMP_Text panelText;
 
-    private Transform cameraTransform;
+    public Transform cameraTransform;
     private TreeAttributes treeAttributes;
 
     public List<string> everyAttribute;
@@ -85,6 +85,7 @@ public class PanelAboveTree : MonoBehaviour
             //panelInstance.transform.position = transform.position + offset;
             panelInstance.transform.LookAt(cameraTransform);
             panelInstance.SetActive(true);
+            panelInstance.transform.Rotate(0, 180, 0);
         }
     }
 
