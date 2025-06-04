@@ -17,6 +17,7 @@ public class FilterElementScript : MonoBehaviour
 
 
 
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -28,7 +29,8 @@ public class FilterElementScript : MonoBehaviour
 
     void OnEndEdit(string finalText)
     {
-        FilterByMenu.Instance.deleteCriteria(filterCriteria);
+        //FilterByMenu.Instance.deleteCriteria(filterCriteria);
+        GroupStatisticsMenu.Instance.deleteCriteria(filterCriteria);
 
 
 
@@ -42,7 +44,8 @@ public class FilterElementScript : MonoBehaviour
         {
             errorText.SetActive(false);
             filterCriteria = new FilterCriteria(attributeDropdown.options[attributeDropdown.value].text, filterOperation, value);
-            FilterByMenu.Instance.addCriteria(filterCriteria);
+            //FilterByMenu.Instance.addCriteria(filterCriteria);
+            GroupStatisticsMenu.Instance.addCriteria(filterCriteria);
         }
 
         else
@@ -63,7 +66,9 @@ public class FilterElementScript : MonoBehaviour
     public void onDeleteButton()
     {
         // Remove this filter element from the UI
-        FilterByMenu.Instance.deleteCriteria(filterCriteria);
+        //FilterByMenu.Instance.deleteCriteria(filterCriteria);
+
+        GroupStatisticsMenu.Instance.deleteCriteria(filterCriteria);
         
         Destroy(gameObject);
     }

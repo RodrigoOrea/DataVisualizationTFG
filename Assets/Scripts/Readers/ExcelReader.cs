@@ -99,4 +99,28 @@ public static class ExcelReader
                 return evaluatedValue.FormatAsString(); // Valor genérico como string
         }
     }
+
+    public static List<string> GetSheetNames(string path)
+    {
+        var sheetNames = new List<string>();
+        try
+        {
+            if (!File.Exists(path))
+                return sheetNames;
+            using (FileStream file = new FileStream(path, FileMode.Open, FileAccess.Read))
+            {
+                IWorkbook workbook = new XSSFWorkbook(file);
+                for (int i = 0; i < workbook.NumberOfSheets; i++)
+                {
+                    string sheetName = workbook.GetSheetName(i);
+                    sheetNames.Add(sheetName);
+                }
+            }
+        }
+        catch (System.IO.FileNotFoundException ex)
+        {
+            ErrorHandler.Instance.LogErrorLoad("Could not find the file: " + ex.FileName);
+        }
+        return sheetNames;
+    }
 }

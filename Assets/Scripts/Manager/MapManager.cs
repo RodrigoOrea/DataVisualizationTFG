@@ -112,55 +112,108 @@ public class MapManager : MonoBehaviour
     }
 
     public void ApplyFilters(List<FilterCriteria> filters)
-{
-    foreach (var tree in MapSceneController.Instance.InstantiatedPrefabs)
     {
-        if (tree == null) continue;
-
-        var attr = tree.GetComponent<TreeAttributes>();
-        if (attr == null)
+        foreach (var tree in MapSceneController.Instance.InstantiatedPrefabs)
         {
-            Debug.LogWarning($"Tree {tree.name} no tiene componente TreeAttributes.");
-            tree.SetActive(false);
-            continue;
+            if (tree == null) continue;
+
+            var attr = tree.GetComponent<TreeAttributes>();
+            if (attr == null)
+            {
+                Debug.LogWarning($"Tree {tree.name} no tiene componente TreeAttributes.");
+                tree.SetActive(false);
+                continue;
+            }
+
+            // Convertimos atributos a diccionario
+            Dictionary<string, float> attributeDict = new Dictionary<string, float>();
+            foreach (var pair in attr.attributes)
+            {
+                if (float.TryParse(pair.Value, System.Globalization.NumberStyles.Float,
+                                   System.Globalization.CultureInfo.InvariantCulture, out float parsed))
+                {
+                    attributeDict[pair.Key] = parsed;
+                }
+                else
+                {
+                    Debug.LogWarning($"No se pudo parsear el valor '{pair.Value}' del atributo '{pair.Key}' en {tree.name}.");
+                }
+            }
+
+            // Evaluar filtros
+            bool allPassed = true;
+            foreach (var filter in filters)
+            {
+                bool passed = filter.Evaluate(attributeDict);
+                if (!passed)
+                {
+                    Debug.Log($"Tree {tree.name} FAILS filter: {filter}");
+                    allPassed = false;
+                    break; // con que falle uno basta
+                }
+            }
+
+            if (allPassed)
+            {
+                Debug.Log($"Tree {tree.name} PASSES all filters.");
+            }
+
+            tree.SetActive(allPassed);
+        }
+    }
+        public void SetAttributesToSheet(int sheetIndex)
+    {
+        // 1. Cambiar hoja en Excel
+        ExcelRepresentation.Instance.sheetIndex = sheetIndex;
+        ExcelRepresentation.Instance.setExcelSheet();
+
+        // 2. Leer nuevo dataset
+        var treeDataList = ExcelRepresentation.Instance.getAttributes();
+
+        // 3. Obtener la clave actual (ej: especie, ID, etc.)
+        string currentKey = !string.IsNullOrEmpty(MenuController.Instance.selectedKey)
+            ? MenuController.Instance.selectedKey
+            : treeDataList[0].Keys.FirstOrDefault();
+
+        if (string.IsNullOrEmpty(currentKey))
+        {
+            Debug.LogError("No se encontró una clave válida en la hoja del Excel.");
+            return;
         }
 
-        // Convertimos atributos a diccionario
-        Dictionary<string, float> attributeDict = new Dictionary<string, float>();
-        foreach (var pair in attr.attributes)
+        // 4. Generar nuevo diccionario con los datos
+        var treeDataDict = treeDataList
+            .Where(d => d.ContainsKey(currentKey) && !string.IsNullOrEmpty(d[currentKey]))
+            .GroupBy(d => d[currentKey])
+            .ToDictionary(g => g.Key, g => g.First());
+
+        // 5. Asignar los nuevos atributos a cada árbol instanciado
+        foreach (var tree in MapSceneController.Instance.InstantiatedPrefabs)
         {
-            if (float.TryParse(pair.Value, System.Globalization.NumberStyles.Float,
-                               System.Globalization.CultureInfo.InvariantCulture, out float parsed))
+            if (tree == null) continue;
+
+            var attr = tree.GetComponent<TreeAttributes>();
+            if (attr == null) continue;
+
+            string key = tree.name.Replace("Tree_", "");
+
+            if (treeDataDict.TryGetValue(key, out var newAttributes))
             {
-                attributeDict[pair.Key] = parsed;
+                attr.SetAttributes(newAttributes);
             }
             else
             {
-                Debug.LogWarning($"No se pudo parsear el valor '{pair.Value}' del atributo '{pair.Key}' en {tree.name}.");
+                attr.SetAttributes(new Dictionary<string, string>
+                {
+                    { "Error", $"No se encontró match para '{key}' en la nueva hoja con clave '{currentKey}'." }
+                });
             }
         }
 
-        // Evaluar filtros
-        bool allPassed = true;
-        foreach (var filter in filters)
-        {
-            bool passed = filter.Evaluate(attributeDict);
-            if (!passed)
-            {
-                Debug.Log($"Tree {tree.name} FAILS filter: {filter}");
-                allPassed = false;
-                break; // con que falle uno basta
-            }
-        }
-
-        if (allPassed)
-        {
-            Debug.Log($"Tree {tree.name} PASSES all filters.");
-        }
-
-        tree.SetActive(allPassed);
+        Debug.Log($"Datos actualizados desde la hoja: {ExcelRepresentation.Instance.getCurrentSheetString()}");
     }
-}
+
+
 
 
 

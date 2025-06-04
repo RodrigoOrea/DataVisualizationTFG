@@ -33,6 +33,8 @@ public class UIManager : MonoBehaviour
 
     public GameObject overviewCamera;
 
+    public TMP_Text currentSheetText;
+
     private void Start()
     {
         if (Instance == null) Instance = this;
@@ -47,6 +49,8 @@ public class UIManager : MonoBehaviour
         PopulateDropdown();
         infoPanelTree.SetActive(true);
         attributeDropdown.onValueChanged.AddListener(OnAttributeSelected);
+
+        SetCurrentSheetText();
     }
 
     private void PopulateDropdown()
@@ -129,5 +133,33 @@ public class UIManager : MonoBehaviour
             overviewCamera.SetActive(!overviewCamera.activeSelf);
         }
 
+
+
+    }
+
+    public void SetCurrentSheetText()
+    {
+        currentSheetText.text = ExcelRepresentation.Instance.getCurrentSheetString();
+    }
+
+    public void OnSheetSelectorBack()
+    {
+        ExcelRepresentation.Instance.setCurrentSheet(-1);
+        currentSheetText.text = ExcelRepresentation.Instance.getCurrentSheetString();
+
+        MapManager.Instance.SetAttributesToSheet(ExcelRepresentation.Instance.sheetIndex);
+    }
+    public void OnSheetSelectorForth()
+    {
+        ExcelRepresentation.Instance.setCurrentSheet(+1);
+        currentSheetText.text = ExcelRepresentation.Instance.getCurrentSheetString();
+
+        MapManager.Instance.SetAttributesToSheet(ExcelRepresentation.Instance.sheetIndex);
+    }
+
+    public void OnCreateNewAttribute()
+    {
+        // Aquí puedes implementar la lógica para crear un nuevo atributo
+        Debug.Log("Crear nuevo atributo");
     }
 }

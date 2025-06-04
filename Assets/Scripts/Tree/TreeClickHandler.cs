@@ -34,7 +34,7 @@ public class TreeClickHandler : MonoBehaviour
                     {
                         // Mostrar la info
                         if (panel != null) panel.ShowTreeInfo();
-                        Debug.Log("Clicked on " + gameObject.name);
+                        Debug.Log("Clicked on " + gameObject.name + "\n" + gameObject.GetComponent<TreeAttributes>().ToString());
                         //set the bar
                         if (UIManager.Instance.selectedAttributeBoolean)
                         {

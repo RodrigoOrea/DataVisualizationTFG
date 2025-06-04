@@ -44,15 +44,7 @@ public class PanelAboveTree : MonoBehaviour
             Debug.LogWarning("Panel Prefab no asignado en " + gameObject.name);
         }
 
-        //Calculate every attribute
-         if (treeAttributes != null && panelInstance != null)
-        {
-            // Construimos la info
-            foreach (var attribute in treeAttributes.attributes)
-            {
-                everyAttribute.Add($"{attribute.Key}: {attribute.Value}");
-            }
-        }
+        CalculateEveryAttribute();
     }
 
     void LateUpdate()
@@ -67,6 +59,7 @@ public class PanelAboveTree : MonoBehaviour
     // Muestra la info del árbol en el panel
     public void ShowTreeInfo()
     {
+        CalculateEveryAttribute();
         if (treeAttributes != null && panelInstance != null)
         {
             // Construimos la info
@@ -104,6 +97,19 @@ public class PanelAboveTree : MonoBehaviour
         if (panelInstance != null)
         {
             panelInstance.SetActive(false);
+        }
+    }
+    public void CalculateEveryAttribute()
+    {
+        everyAttribute.Clear();
+        //Calculate every attribute
+        if (treeAttributes != null && panelInstance != null)
+        {
+            // Construimos la info
+            foreach (var attribute in treeAttributes.attributes)
+            {
+                everyAttribute.Add($"{attribute.Key}: {attribute.Value}");
+            }
         }
     }
 }

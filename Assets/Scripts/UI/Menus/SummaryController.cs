@@ -20,7 +20,7 @@ public class SummaryController : MonoBehaviour
         Debug.Log("SummaryController OnEnable");
         excelFilePathText.text = Path.GetFileName(ExcelRepresentation.Instance.path);
         kmlFileNameText.text = Path.GetFileName(KMLRepresentation.Instance.path);
-        PopulateSheets(ExcelRepresentation.Instance.path);
+        PopulateSheets();
         sheetDropdown.onValueChanged.AddListener(OnSheetSelected);
 
         CheckIfFileExists(ExcelRepresentation.Instance.path, "Excel");
@@ -34,9 +34,9 @@ public class SummaryController : MonoBehaviour
 
     }
 
-    private void PopulateSheets(string location)
+    private void PopulateSheets()
     {
-        List<string> sheetNames = KMLParser.GetSheetNames(location);
+        List<string> sheetNames = ExcelRepresentation.Instance.getSheetNames();
 
         sheetDropdown.ClearOptions();
         if (sheetNames.Count > 0)
@@ -53,7 +53,8 @@ public class SummaryController : MonoBehaviour
     {
         if (index >= 0 && index < sheetDropdown.options.Count)
         {
-            MenuController.Instance.excelSheetIndex = index;
+            ExcelRepresentation.Instance.setCurrentSheet(index);
+            ExcelRepresentation.Instance.setExcelSheet();
             Debug.Log($"Selected sheet: {sheetDropdown.options[index].text}");
         }
         else
