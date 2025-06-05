@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
-public class FilterByMenu : SingletonMonoBehavior<FilterByMenu>
+public class FilterByMenu : SingletonMonoBehavior<FilterByMenu>, IFilterHandler
 {
     [SerializeField] private Transform filterContainer;      // Contenedor con Vertical Layout
     [SerializeField] private GameObject filterPrefab;        // Prefab de filtro (dropdown + input + delete)
@@ -14,12 +14,14 @@ public class FilterByMenu : SingletonMonoBehavior<FilterByMenu>
 
     public GameObject lastFilter; // Inspector
 
-    public int instantiatedFilterElements = 1; // Contador de elementos instanciados
+    private int instantiatedFilterElements = 0; // Contador de elementos instanciados
 
     private void Start()
     {
+        Debug.Log("instantiatedFilterElements at the start: " + instantiatedFilterElements);
         addFilterButton.onClick.AddListener(AddNewFilter);
         applyFiltersButton.onClick.AddListener(ApplyFilters);
+        AddNewFilter(); // Añadir un filtro por defecto al inicio
     }
 
     private void AddNewFilter()
@@ -28,11 +30,15 @@ public class FilterByMenu : SingletonMonoBehavior<FilterByMenu>
 
         GameObject newFilterObj = Instantiate(filterPrefab, filterContainer);
 
+        newFilterObj.GetComponent<FilterElementScript>().Initialize(this);
+
         newFilterObj.transform.SetSiblingIndex(index);
 
         lastFilter = newFilterObj;
 
         instantiatedFilterElements++;
+
+        Debug.Log("New filter added.");
     }
     private void ApplyFilters()
     {
@@ -42,6 +48,7 @@ public class FilterByMenu : SingletonMonoBehavior<FilterByMenu>
     {
         ApplyFilters();
         gameObject.SetActive(false);
+        if(UIManager.Instance.heatmap.activeSelf) MapManager.Instance.ActivateHeatmap(UIManager.Instance.selectedAttributeString);
     }
 
     public void onBackButton()

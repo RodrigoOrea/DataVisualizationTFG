@@ -51,7 +51,6 @@ public class MapManager : MonoBehaviour
     public void ActivateProgressBars(string attribute)
     {
         var stats = CalculateStats(attribute);
-        UIManager.Instance.UpdateBarValues(stats);
 
         foreach (var tree in MapSceneController.Instance.InstantiatedPrefabs)
         {

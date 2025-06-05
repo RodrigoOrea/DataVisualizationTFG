@@ -14,6 +14,8 @@ public class FilterElementScript : MonoBehaviour
 
     public GameObject errorText; // Text to display error messages
 
+    public IFilterHandler handler { get; private set; }
+
 
 
 
@@ -24,13 +26,18 @@ public class FilterElementScript : MonoBehaviour
         // Initialize the dropdown with filter options
         PopulateFilterOptions();
         inputField.onEndEdit.AddListener(OnEndEdit);
+
+    }
+
+    public void Initialize(IFilterHandler filterHandler)
+    {
+        handler = filterHandler;
     }
 
 
     void OnEndEdit(string finalText)
     {
-        //FilterByMenu.Instance.deleteCriteria(filterCriteria);
-        GroupStatisticsMenu.Instance.deleteCriteria(filterCriteria);
+        handler.deleteCriteria(filterCriteria);
 
 
 
@@ -44,8 +51,7 @@ public class FilterElementScript : MonoBehaviour
         {
             errorText.SetActive(false);
             filterCriteria = new FilterCriteria(attributeDropdown.options[attributeDropdown.value].text, filterOperation, value);
-            //FilterByMenu.Instance.addCriteria(filterCriteria);
-            GroupStatisticsMenu.Instance.addCriteria(filterCriteria);
+            handler.addCriteria(filterCriteria);
         }
 
         else
@@ -66,9 +72,8 @@ public class FilterElementScript : MonoBehaviour
     public void onDeleteButton()
     {
         // Remove this filter element from the UI
-        //FilterByMenu.Instance.deleteCriteria(filterCriteria);
 
-        GroupStatisticsMenu.Instance.deleteCriteria(filterCriteria);
+        handler.deleteCriteria(filterCriteria);
         
         Destroy(gameObject);
     }

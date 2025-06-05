@@ -258,7 +258,7 @@ namespace HeatMap2D
 					Debug.LogWarning($"Found null tree at index {treeCount}");
 					continue;
 				}
-
+				if(!Tree.activeSelf) continue; // Skip inactive trees, when the user filters trees, they should not be included in the heatmap
             	Vector3 position = Tree.transform.position;
 				var treeAttributes = Tree.GetComponent<TreeAttributes>();
 				if (treeAttributes == null) {

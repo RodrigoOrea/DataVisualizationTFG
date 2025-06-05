@@ -4,14 +4,15 @@ using System.Globalization;
 public static class FilterCriteriaParser
 {
     private static readonly Regex CriteriaRegex = new Regex(
-        @"^\s*(\w+)\s*(>=|<=|=|<|>)\s*(-?\d+(\.\d+)?)\s*$",
-        RegexOptions.Compiled
+    @"^\s*(\w+)\s*(>=|<=|!=|=|<|>)\s*(-?\d+(\.\d+)?)\s*$",
+    RegexOptions.Compiled
     );
 
     private static readonly Regex OperationValueRegex = new Regex(
-        @"^\s*(>=|<=|=|<|>)\s*(-?\d+(\.\d+)?)\s*$",
+        @"^\s*(>=|<=|!=|=|<|>)\s*(-?\d+(\.\d+)?)\s*$",
         RegexOptions.Compiled
     );
+
 
     public static bool TryParse(string input, out FilterCriteria criteria)
     {
@@ -57,6 +58,7 @@ public static class FilterCriteriaParser
         operation = op switch
         {
             "=" => FilterOperation.Equal,
+            "!=" => FilterOperation.NotEqual, // 👈 nuevo
             "<" => FilterOperation.LessThan,
             ">" => FilterOperation.GreaterThan,
             "<=" => FilterOperation.LessThanOrEqual,
@@ -64,6 +66,7 @@ public static class FilterCriteriaParser
             _ => default
         };
 
-        return op is "=" or "<" or ">" or "<=" or ">=";
+        return op is "=" or "!=" or "<" or ">" or "<=" or ">=";
     }
+
 }

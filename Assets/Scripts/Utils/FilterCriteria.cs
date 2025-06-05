@@ -4,6 +4,7 @@ using UnityEngine;
 public enum FilterOperation
 {
     Equal,
+    NotEqual,
     LessThan,
     GreaterThan,
     LessThanOrEqual,
@@ -31,6 +32,7 @@ public class FilterCriteria
         return Operation switch
         {
             FilterOperation.Equal => attrValue == Value,
+            FilterOperation.NotEqual => attrValue != Value,
             FilterOperation.LessThan => attrValue < Value,
             FilterOperation.GreaterThan => attrValue > Value,
             FilterOperation.LessThanOrEqual => attrValue <= Value,
@@ -44,6 +46,7 @@ public class FilterCriteria
         string op = Operation switch
         {
             FilterOperation.Equal => "=",
+            FilterOperation.NotEqual => "!=",
             FilterOperation.LessThan => "<",
             FilterOperation.GreaterThan => ">",
             FilterOperation.LessThanOrEqual => "<=",

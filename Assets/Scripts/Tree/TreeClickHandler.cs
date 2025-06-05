@@ -42,7 +42,6 @@ public class TreeClickHandler : MonoBehaviour
                             (float min, float max, float avg) Stats = MapManager.Instance.CalculateStats(currentSelectedAttribute);
                             float value = this.gameObject.GetComponent<TreeAttributes>().GetValue(currentSelectedAttribute);
                             //UIManager.Instance.currentText.GetComponent<TMP_Text>().text = "Current-" + Math.Round(value, 4).ToString();
-                            BarScript.instance.UpdateIndicator(Stats.min, Stats.max, value);
                             bar.UpdateProgressBar(currentSelectedAttribute, Stats);
                             bar.ShowBar();
                         }

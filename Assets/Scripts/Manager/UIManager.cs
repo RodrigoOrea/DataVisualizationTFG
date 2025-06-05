@@ -10,18 +10,12 @@ public class UIManager : MonoBehaviour
 
     [Header("UI Elements")]
     [SerializeField] private GameObject infoPanelTree;
-    [SerializeField] private TMP_Text treeAttibutes;
     [SerializeField] private TMP_Dropdown attributeDropdown;
-    [SerializeField] private RectTransform panelRectTransform;
     [SerializeField] private GameObject barCanvas;
-    [SerializeField] private GameObject minText;
-    [SerializeField] private GameObject avgText;
-    [SerializeField] private GameObject maxText;
     [SerializeField] public GameObject heatmap;
     [SerializeField] private GameObject heatmapToggle;
     [SerializeField] private GameObject treeColorToggle;
     [SerializeField] private GameObject progressBarToggle;
-    [SerializeField] private GameObject showAllTreesToggle;
 
     [Header("Data")]
     public List<Dictionary<string, string>> treeDataList;
@@ -29,7 +23,6 @@ public class UIManager : MonoBehaviour
 
     public bool selectedAttributeBoolean;
     public string selectedAttributeString;
-    internal object currentText;
 
     public GameObject overviewCamera;
 
@@ -74,7 +67,6 @@ public class UIManager : MonoBehaviour
         {
             selectedAttributeBoolean = true;
             selectedAttributeString = attributeKeys[index - 1];
-            barCanvas.SetActive(true);
 
             if (heatmapToggle.GetComponent<Toggle>().isOn)
                 MapManager.Instance.ActivateHeatmap(selectedAttributeString);
@@ -119,13 +111,6 @@ public class UIManager : MonoBehaviour
             MapManager.Instance.HideAllTreePanels();
     }
 
-    public void UpdateBarValues((float min, float max, float avg) stats)
-    {
-        minText.GetComponent<TMP_Text>().text = $"Min: {Math.Round(stats.min, 4)}";
-        maxText.GetComponent<TMP_Text>().text = $"Max: {Math.Round(stats.max, 4)}";
-        avgText.GetComponent<TMP_Text>().text = $"Avg: {Math.Round(stats.avg, 4)}";
-    }
-
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.L))
@@ -161,5 +146,12 @@ public class UIManager : MonoBehaviour
     {
         // Aquí puedes implementar la lógica para crear un nuevo atributo
         Debug.Log("Crear nuevo atributo");
+    }
+
+    public void DisableAll()
+    {
+        MapManager.Instance.DeactivateHeatmap();
+        MapManager.Instance.DeactivateProgressBars();
+        MapManager.Instance.HideAllTreePanels();
     }
 }

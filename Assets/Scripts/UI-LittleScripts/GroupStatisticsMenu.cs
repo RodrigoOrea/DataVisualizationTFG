@@ -5,7 +5,7 @@ using TMPro;
 using System.Text.RegularExpressions;
 using System.Linq;
 
-public class GroupStatisticsMenu : SingletonMonoBehavior<GroupStatisticsMenu>
+public class GroupStatisticsMenu : SingletonMonoBehavior<GroupStatisticsMenu>, IFilterHandler
 {
     [SerializeField] private Transform filterContainer;      // Contenedor con Vertical Layout
     [SerializeField] private GameObject filterPrefab;        // Prefab de filtro (dropdown + input + delete)
@@ -16,7 +16,7 @@ public class GroupStatisticsMenu : SingletonMonoBehavior<GroupStatisticsMenu>
 
     public GameObject lastFilter; // Inspector
 
-    public int instantiatedFilterElements = 1; // Contador de elementos instanciados
+    private int instantiatedFilterElements = 0; // Contador de elementos instanciados
 
     public GameObject statisticsMenu; // Panel para mostrar estadísticas
 
@@ -28,6 +28,7 @@ public class GroupStatisticsMenu : SingletonMonoBehavior<GroupStatisticsMenu>
     {
         addFilterButton.onClick.AddListener(AddNewFilter);
         applyFiltersButton.onClick.AddListener(PopulateTable);
+        AddNewFilter(); // Añadir un filtro por defecto al inicio
     }
 
     private void AddNewFilter()
@@ -35,6 +36,8 @@ public class GroupStatisticsMenu : SingletonMonoBehavior<GroupStatisticsMenu>
         int index = lastFilter.transform.GetSiblingIndex() + 1;
 
         GameObject newFilterObj = Instantiate(filterPrefab, filterContainer);
+
+        newFilterObj.GetComponent<FilterElementScript>().Initialize(this);
 
         newFilterObj.transform.SetSiblingIndex(index);
 

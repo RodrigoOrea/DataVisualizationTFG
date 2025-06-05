@@ -20,7 +20,6 @@ public class PanelAboveTree : MonoBehaviour
 
     void Start()
     {
-        Debug.Log("PanelAboveTree Start");
         // Encontrar la cámara principal
         cameraTransform = Camera.main ? Camera.main.transform : null;
         // Encontrar TreeAttributes en este objeto
