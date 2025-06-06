@@ -16,6 +16,8 @@ public class FilterByMenu : SingletonMonoBehavior<FilterByMenu>, IFilterHandler
 
     private int instantiatedFilterElements = 0; // Contador de elementos instanciados
 
+    public List<GameObject> instantiatedFilterElementsList = new List<GameObject>();
+
     private void Start()
     {
         Debug.Log("instantiatedFilterElements at the start: " + instantiatedFilterElements);
@@ -26,19 +28,18 @@ public class FilterByMenu : SingletonMonoBehavior<FilterByMenu>, IFilterHandler
 
     private void AddNewFilter()
     {
-        int index = lastFilter.transform.GetSiblingIndex() + 1;
 
         GameObject newFilterObj = Instantiate(filterPrefab, filterContainer);
 
         newFilterObj.GetComponent<FilterElementScript>().Initialize(this);
 
-        newFilterObj.transform.SetSiblingIndex(index);
+        instantiatedFilterElementsList.Add(newFilterObj);
 
         lastFilter = newFilterObj;
 
         instantiatedFilterElements++;
 
-        Debug.Log("New filter added.");
+        Debug.Log("Current active filters: " + instantiatedFilterElements);
     }
     private void ApplyFilters()
     {
@@ -65,19 +66,15 @@ public class FilterByMenu : SingletonMonoBehavior<FilterByMenu>, IFilterHandler
     public void deleteCriteria(FilterCriteria criteria)
     {
         filterCriteriaList.Remove(criteria);
+        instantiatedFilterElements--;
+        Debug.Log("Current active filters: " + instantiatedFilterElements);
         Debug.Log($"Filter criteria removed: {criteria}");
     }
 
     void Update()
     {
-        if (instantiatedFilterElements != filterCriteriaList.Count)
-        {
-            applyFiltersButton.interactable = false;
-        }
-        else
-        {
-            applyFiltersButton.interactable = true;
-        }
+        // Habilitar el botón Apply si hay al menos un criterio válido
+        applyFiltersButton.interactable = filterCriteriaList.Count > 0;
     }
 
 }

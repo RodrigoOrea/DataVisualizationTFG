@@ -131,15 +131,14 @@ public class UIManager : MonoBehaviour
     {
         ExcelRepresentation.Instance.setCurrentSheet(-1);
         currentSheetText.text = ExcelRepresentation.Instance.getCurrentSheetString();
-
-        MapManager.Instance.SetAttributesToSheet(ExcelRepresentation.Instance.sheetIndex);
+        UpdateMap();
     }
     public void OnSheetSelectorForth()
     {
         ExcelRepresentation.Instance.setCurrentSheet(+1);
         currentSheetText.text = ExcelRepresentation.Instance.getCurrentSheetString();
+        UpdateMap();
 
-        MapManager.Instance.SetAttributesToSheet(ExcelRepresentation.Instance.sheetIndex);
     }
 
     public void OnCreateNewAttribute()
@@ -153,5 +152,13 @@ public class UIManager : MonoBehaviour
         MapManager.Instance.DeactivateHeatmap();
         MapManager.Instance.DeactivateProgressBars();
         MapManager.Instance.HideAllTreePanels();
+    }
+
+    public void UpdateMap()
+    {
+        MapManager.Instance.SetAttributesToSheet(ExcelRepresentation.Instance.sheetIndex);
+        if (heatmap.activeSelf) MapManager.Instance.ActivateHeatmap(selectedAttributeString);
+        if (progressBarToggle.GetComponent<Toggle>().isOn) MapManager.Instance.ActivateProgressBars(selectedAttributeString);
+        
     }
 }

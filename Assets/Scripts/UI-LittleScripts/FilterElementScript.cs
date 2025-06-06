@@ -74,7 +74,8 @@ public class FilterElementScript : MonoBehaviour
         // Remove this filter element from the UI
 
         handler.deleteCriteria(filterCriteria);
-        
+
+
         Destroy(gameObject);
     }
 
@@ -94,4 +95,15 @@ public class FilterElementScript : MonoBehaviour
     {
         this.filterCriteria = criteria;
     }
+
+    public void CopyStateFrom(FilterElementScript source)
+    {
+        this.filterCriteria = source.filterCriteria;
+        this.attributeDropdown.value = source.attributeDropdown.value;
+        this.inputField.text = source.inputField.text;
+        this.errorText.SetActive(source.errorText.activeSelf);
+        this.errorText.GetComponent<TMP_Text>().text = source.errorText.GetComponent<TMP_Text>().text;
+        this.handler = source.handler;
+        
+}
 }

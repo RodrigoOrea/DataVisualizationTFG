@@ -33,15 +33,10 @@ public class GroupStatisticsMenu : SingletonMonoBehavior<GroupStatisticsMenu>, I
 
     private void AddNewFilter()
     {
-        int index = lastFilter.transform.GetSiblingIndex() + 1;
 
         GameObject newFilterObj = Instantiate(filterPrefab, filterContainer);
 
         newFilterObj.GetComponent<FilterElementScript>().Initialize(this);
-
-        newFilterObj.transform.SetSiblingIndex(index);
-
-        lastFilter = newFilterObj;
 
         instantiatedFilterElements++;
     }
@@ -61,7 +56,7 @@ public class GroupStatisticsMenu : SingletonMonoBehavior<GroupStatisticsMenu>, I
                 $"Prom: {stat.Value.avg}");
 
             GameObject row = Instantiate(rowPrefab, rowParent.transform);
-            row.GetComponent<RowScript>().InitializeRow(stat.Key, stat.Value.min, stat.Value.max, stat.Value.avg);
+            row.GetComponent<RowScript>().InitializeRow(stat.Key, stat.Value.avg, stat.Value.min, stat.Value.max);
         }
     }
     public void onApplyButton()
@@ -154,15 +149,15 @@ public class GroupStatisticsMenu : SingletonMonoBehavior<GroupStatisticsMenu>, I
     {
         // Estructura para almacenar valores por atributo
         Dictionary<string, List<float>> attributeValues = new Dictionary<string, List<float>>();
-        
+
         // Recopilar datos
         foreach (var tree in trees)
         {
             if (tree == null) continue;
-            
+
             var attr = tree.GetComponent<TreeAttributes>();
             if (attr == null) continue;
-            
+
             foreach (var pair in attr.attributes)
             {
                 if (float.TryParse(pair.Value, System.Globalization.NumberStyles.Float,
@@ -176,24 +171,79 @@ public class GroupStatisticsMenu : SingletonMonoBehavior<GroupStatisticsMenu>, I
                 }
             }
         }
-        
+
         // Calcular estadísticas
         Dictionary<string, (float min, float max, float avg)> stats = new Dictionary<string, (float, float, float)>();
-        
+
         foreach (var kvp in attributeValues)
         {
             string attribute = kvp.Key;
             List<float> values = kvp.Value;
-            
+
             if (values.Count == 0) continue;
-            
+
             float min = values.Min();
             float max = values.Max();
             float avg = values.Average();
-            
+
             stats[attribute] = (min, max, avg);
         }
-        
+
         return stats;
     }
+
+    public void CopyFromFilters()
+    {
+        // Limpiar estado actual
+        filterCriteriaList.Clear();
+        instantiatedFilterElements = 0;
+
+        // Destruir todos los filtros existentes excepto el último (si existe)
+        foreach (Transform child in filterContainer)
+        {
+            if (child.gameObject != lastFilter)
+            {
+                Destroy(child.gameObject);
+            }
+        }
+
+        // Copiar los filtros de FilterByMenu
+        if (FilterByMenu.Instance != null && FilterByMenu.Instance.instantiatedFilterElementsList.Count > 0)
+        {
+            foreach (var sourceFilter in FilterByMenu.Instance.instantiatedFilterElementsList)
+            {
+                if (sourceFilter == null) continue;
+
+                // Crear nuevo filtro
+                GameObject newFilter = Instantiate(filterPrefab, filterContainer);
+                var filterElement = newFilter.GetComponent<FilterElementScript>();
+
+                if (filterElement != null)
+                {
+                    filterElement.Initialize(this);
+
+                    // Copiar estado visual del filtro
+                    var sourceElement = sourceFilter.GetComponent<FilterElementScript>();
+                    if (sourceElement != null)
+                    {
+                        filterElement.CopyStateFrom(sourceElement);
+                    }
+
+                    // Actualizar referencias
+                    lastFilter = newFilter;
+                    instantiatedFilterElements++;
+                }
+            }
+
+            // Copiar la lista de criterios
+            filterCriteriaList.AddRange(FilterByMenu.Instance.filterCriteriaList);
+        }
+        else
+        {
+            Debug.LogWarning("No hay filtros para copiar en FilterByMenu");
+            // Añadir un filtro vacío por defecto si no hay ninguno
+            AddNewFilter();
+        }
+    }
+    
 }
