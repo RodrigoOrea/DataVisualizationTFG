@@ -1,65 +1,72 @@
-using System;
 using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class TreeClickHandler : MonoBehaviour
 {
     private PanelAboveTree panel;
+    private ProgressBar bar;
 
     private void Start()
     {
-        // Supone que PanelAboveTree está en ESTE MISMO objeto
         panel = GetComponent<PanelAboveTree>();
+        bar = GetComponent<ProgressBar>();
     }
 
     void Update()
     {
         if (Input.GetMouseButtonDown(0))
         {
+            // Verificar si hay UI delante (incluye el panel del árbol)
+            if (EventSystem.current.IsPointerOverGameObject())
+            {
+                // Si el clic fue en nuestro propio panel, no hacer nada
+                // Si fue en otra UI, ignorar el clic en el árbol
+                return;
+            }
+
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
             if (Physics.Raycast(ray, out RaycastHit hitInfo))
             {
-                // ¿El objeto golpeado es este?
                 if (hitInfo.collider.gameObject == this.gameObject)
                 {
-                    ProgressBar bar = this.gameObject.GetComponent<ProgressBar>();
-                    if (panel.panelInstance.activeSelf)
-                    {
-                        // Ocultar la info
-                        if (panel != null) panel.HidePanel();
-                        bar.HideBar();
-
-                    }
-                    else
-                    {
-                        // Mostrar la info
-                        if (panel != null) panel.ShowTreeInfo();
-                        Debug.Log("Clicked on " + gameObject.name + "\n" + gameObject.GetComponent<TreeAttributes>().ToString());
-                        //set the bar
-                        if (UIManager.Instance.selectedAttributeBoolean)
-                        {
-                            String currentSelectedAttribute = UIManager.Instance.selectedAttributeString;
-                            (float min, float max, float avg) Stats = MapManager.Instance.CalculateStats(currentSelectedAttribute);
-                            float value = this.gameObject.GetComponent<TreeAttributes>().GetValue(currentSelectedAttribute);
-                            //UIManager.Instance.currentText.GetComponent<TMP_Text>().text = "Current-" + Math.Round(value, 4).ToString();
-                            bar.UpdateProgressBar(currentSelectedAttribute, Stats);
-                            bar.ShowBar();
-                        }
-                    }
+                    ToggleTreeInfo();
                 }
-                else
-                {
-                    // Ocultar
-                    //if (panel != null) panel.HidePanel();
-                }
-            }
-            else
-            {
-                // Clic en el vacío
-                //if (panel != null) panel.HidePanel();
             }
         }
     }
+
+    private void ToggleTreeInfo()
+    {
+        if (panel.panelInstance.activeSelf)
+        {
+            HideTreeInfo();
+        }
+        else
+        {
+            ShowTreeInfo();
+        }
+    }
+
+    private void ShowTreeInfo()
+    {
+        if (panel != null) panel.ShowTreeInfo();
+        Debug.Log("Clicked on " + gameObject.name + "\n" + gameObject.GetComponent<TreeAttributes>().ToString());
+        
+        if (UIManager.Instance.selectedAttributeBoolean)
+        {
+            string currentSelectedAttribute = UIManager.Instance.selectedAttributeString;
+            var stats = MapManager.Instance.CalculateStats(currentSelectedAttribute);
+            float value = GetComponent<TreeAttributes>().GetValue(currentSelectedAttribute);
+            
+            //bar.UpdateProgressBar(currentSelectedAttribute, stats);
+            //bar.ShowBar();
+        }
+    }
+
+    private void HideTreeInfo()
+    {
+        if (panel != null) panel.HidePanel();
+        bar.HideBar();
+    }
 }
-
-

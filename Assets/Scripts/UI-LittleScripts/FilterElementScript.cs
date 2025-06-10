@@ -1,32 +1,30 @@
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
+using System;
 using System.Collections.Generic;
 
 public class FilterElementScript : MonoBehaviour
 {
-
     [SerializeField] private TMP_Dropdown attributeDropdown;
+    public FilterCriteria filterCriteria;
+    public TMP_InputField inputField;
+    public GameObject errorText;
+    
+    public event Action<bool> OnFilterModified; // Nuevo evento para notificar cambios
+    
+    private IFilterHandler handler;
+    private bool isValid = false;
+    private string lastValidText = "";
 
-    public FilterCriteria filterCriteria; // The filter criteria associated with this element
+    public bool IsValid => isValid;
 
-    public TMP_InputField inputField; // Input field for the filter value
-
-    public GameObject errorText; // Text to display error messages
-
-    public IFilterHandler handler { get; private set; }
-
-
-
-
-
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        // Initialize the dropdown with filter options
         PopulateFilterOptions();
         inputField.onEndEdit.AddListener(OnEndEdit);
-
+        inputField.onValueChanged.AddListener(OnValueChanged);
+        attributeDropdown.onValueChanged.AddListener(_ => OnFilterChanged());
     }
 
     public void Initialize(IFilterHandler filterHandler)
@@ -34,50 +32,80 @@ public class FilterElementScript : MonoBehaviour
         handler = filterHandler;
     }
 
-
-    void OnEndEdit(string finalText)
+    private void OnValueChanged(string text)
     {
-        handler.deleteCriteria(filterCriteria);
+        // Desactivar temporalmente hasta que se presione Enter o se pierda el foco
+        isValid = false;
+        OnFilterModified?.Invoke(false);
+    }
 
+    private void OnEndEdit(string finalText)
+    {
+        if (handler == null) return;
 
+        // Eliminar el criterio anterior si existe
+        if (filterCriteria != null)
+        {
+            handler.DeleteCriteria(filterCriteria);
+        }
 
-        Debug.Log("Input finalizado: " + finalText);
-        // Parse the input and create a FilterCriteria object
+        // Parsear el nuevo input
         float value;
         FilterOperation filterOperation;
-        bool successful = FilterCriteriaParser.TryParseOperationAndValue(inputField.text, out filterOperation, out value);
+        bool successful = FilterCriteriaParser.TryParseOperationAndValue(finalText, out filterOperation, out value);
 
         if (successful)
         {
             errorText.SetActive(false);
             filterCriteria = new FilterCriteria(attributeDropdown.options[attributeDropdown.value].text, filterOperation, value);
-            handler.addCriteria(filterCriteria);
+            handler.AddCriteria(filterCriteria);
+            isValid = true;
+            lastValidText = finalText;
         }
-
         else
         {
             errorText.SetActive(true);
-            errorText.GetComponent<TMP_Text>().text = "Invalid input format. Please use: attribute >= value, attribute <= value, etc.";
+            errorText.GetComponent<TMP_Text>().text = "Invalid input format. Use: attribute >= value";
+            isValid = false;
+            
+            // Restaurar el último valor válido si existe
+            if (!string.IsNullOrEmpty(lastValidText))
+            {
+                inputField.text = lastValidText;
+            }
         }
 
+        OnFilterModified?.Invoke(isValid);
     }
 
-    // Update is called once per frame
-    void Update()
+    private void OnFilterChanged()
     {
-
+        OnFilterModified?.Invoke(isValid);
     }
 
-    //inspector
-    public void onDeleteButton()
+    public void OnDeleteButton()
+{
+    // Notificar primero para actualizar el estado
+    if (filterCriteria != null)
     {
-        // Remove this filter element from the UI
-
-        handler.deleteCriteria(filterCriteria);
-
-
-        Destroy(gameObject);
+        handler.DeleteCriteria(filterCriteria);
     }
+    
+    // Actualizar la lista antes de comprobar el estado
+    if (handler is FilterByMenu menuHandler)
+    {
+        menuHandler.instantiatedFilterElementsList.Remove(gameObject);
+        
+        // Mostrar mensaje si fue el último elemento
+        if (menuHandler.instantiatedFilterElementsList.Count == 0)
+        {
+            menuHandler.ShowFeedback("No filters active - will show all trees when applied", Color.blue);
+        }
+    }
+    
+    OnFilterModified?.Invoke(true);
+    Destroy(gameObject);
+}
 
     public void PopulateFilterOptions()
     {
@@ -91,7 +119,7 @@ public class FilterElementScript : MonoBehaviour
         attributeDropdown.AddOptions(options);
     }
 
-    public void setCriteria(FilterCriteria criteria)
+    public void SetCriteria(FilterCriteria criteria)
     {
         this.filterCriteria = criteria;
     }
@@ -104,6 +132,7 @@ public class FilterElementScript : MonoBehaviour
         this.errorText.SetActive(source.errorText.activeSelf);
         this.errorText.GetComponent<TMP_Text>().text = source.errorText.GetComponent<TMP_Text>().text;
         this.handler = source.handler;
-        
-}
+        this.isValid = source.isValid;
+        this.lastValidText = source.lastValidText;
+    }
 }

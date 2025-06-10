@@ -1,6 +1,10 @@
+using UnityEngine;
+
 public interface IFilterHandler
 {
-    void deleteCriteria(FilterCriteria criteria);
+    void DeleteCriteria(FilterCriteria criteria);
 
-    void addCriteria(FilterCriteria criteria);
+    void AddCriteria(FilterCriteria criteria);
+
+    void ShowFeedback(string message, Color color);
 }

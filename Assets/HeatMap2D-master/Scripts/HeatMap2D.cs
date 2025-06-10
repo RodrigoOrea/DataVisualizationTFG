@@ -166,6 +166,7 @@ namespace HeatMap2D
 		public static Vector4 WeightedAverage(Vector4 pointA, Vector4 pointB)
 		{
 			float wSum = pointA.w + pointB.w;
+			wSum = Mathf.Max(0.0001f, wSum);
 			Assert.IsTrue(wSum > 0.0f, "[HeatMap2D.WeightedAverage] weights should be > 0 !");
 			float wInvSum = 1.0f / wSum;
 			// Weighted-average of coordinates.

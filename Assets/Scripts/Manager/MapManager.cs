@@ -160,6 +160,13 @@ public class MapManager : MonoBehaviour
             tree.SetActive(allPassed);
         }
     }
+
+    public void ClearFilters()
+    {
+        foreach (var tree in MapSceneController.Instance.InstantiatedPrefabs) {
+            tree.SetActive(true);
+        }
+    }
         public void SetAttributesToSheet(int sheetIndex)
     {
         // 1. Cambiar hoja en Excel

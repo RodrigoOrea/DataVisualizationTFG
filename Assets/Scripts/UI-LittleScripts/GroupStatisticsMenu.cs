@@ -40,14 +40,13 @@ public class GroupStatisticsMenu : SingletonMonoBehavior<GroupStatisticsMenu>, I
 
         instantiatedFilterElements++;
     }
-    private void PopulateTable()
+    public void PopulateTable()
     {
         gameObject.SetActive(false);
         statisticsMenu.SetActive(true);
 
         // Obtener los árboles que pasan los filtros
-        List<GameObject> passingTrees = GetTreesThatPassFilters(filterCriteriaList);
-        var stats = CalculateStats(passingTrees);
+        var stats = CalculateStats(MapSceneController.Instance.InstantiatedPrefabs);
         foreach (var stat in stats)
         {
             Debug.Log($"Atributo: {stat.Key} | " +
@@ -70,13 +69,13 @@ public class GroupStatisticsMenu : SingletonMonoBehavior<GroupStatisticsMenu>, I
         gameObject.SetActive(false);
     }
 
-    public void addCriteria(FilterCriteria criteria)
+    public void AddCriteria(FilterCriteria criteria)
     {
         filterCriteriaList.Add(criteria);
         Debug.Log($"Filter criteria added: {criteria}");
     }
 
-    public void deleteCriteria(FilterCriteria criteria)
+    public void DeleteCriteria(FilterCriteria criteria)
     {
         filterCriteriaList.Remove(criteria);
         Debug.Log($"Filter criteria removed: {criteria}");
@@ -153,6 +152,7 @@ public class GroupStatisticsMenu : SingletonMonoBehavior<GroupStatisticsMenu>, I
         // Recopilar datos
         foreach (var tree in trees)
         {
+            if (!tree.activeSelf) continue;
             if (tree == null) continue;
 
             var attr = tree.GetComponent<TreeAttributes>();
@@ -245,5 +245,9 @@ public class GroupStatisticsMenu : SingletonMonoBehavior<GroupStatisticsMenu>, I
             AddNewFilter();
         }
     }
-    
+
+    public void ShowFeedback(string message, Color color)
+    {
+        throw new System.NotImplementedException();
+    }
 }

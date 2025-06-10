@@ -84,7 +84,7 @@ MonoBehaviour:
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
   m_DynamicPixelsPerUnit: 1
-  m_PresetInfoIsWorld: 0
+  m_PresetInfoIsWorld: 1
 --- !u!114 &3223486227383375993
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -248,6 +248,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   heatmap: {fileID: 7242453848748579772}
   radius: 9.67
+  intensity: 0
   generationMethod: 0
   pointsCount: 1023
   reductionMethod: 0

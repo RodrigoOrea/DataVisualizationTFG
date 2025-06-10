@@ -6437,6 +6437,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: '::'
   availablePrefabs:
   - {fileID: 5133708960582683292, guid: 4af5bdf7748ea044393554fda5cee170, type: 3}
+  - {fileID: 5199223814040775156, guid: c2ffdf3ed2599934abc74b1c173d074d, type: 3}
   representationDropdown: {fileID: 187325331}
 --- !u!1 &731772016
 GameObject:

@@ -33,7 +33,9 @@ namespace HeatMap2D
 		public HeatMap2D heatmap;
 		[Range(0.01f, 15.0f)]
 		[Tooltip("Points' radius")]
-		public float radius;
+		public float radius = 3.4f;
+		[Tooltip("Points' intensity")]
+		public float intensity = 0.012f;
 	
 		[Header("Points Generation")]
 		public GenerationMethod generationMethod;
@@ -60,7 +62,7 @@ namespace HeatMap2D
 
 		public static HeatMap2D_Test Instance { get; private set; }
 
-		void Start()
+        void Start()
 		{
 			Instance = this;
 			//_GenerateRandomPoints1();
@@ -73,10 +75,10 @@ namespace HeatMap2D
 				heatmap.Radius = radius;
 			}
 
-			/* if (heatmap.Intensity != intensity)
+			if (heatmap.Intensity != intensity)
 			{
 				heatmap.Intensity = intensity;
-			} */
+			}
 
 			/* if (generationMethod != _generationMethod)
 			{
@@ -235,52 +237,43 @@ namespace HeatMap2D
 		public void _GenerateRandomPointsCesium(string attribute)
 		{
 			Debug.Log($"Starting _GenerateRandomPointsCesium with attribute: {attribute}");
-		
-			Bounds worldBounds = heatmap.WorldBounds;
-			Vector3 min = worldBounds.min;
-			Vector3 max = worldBounds.max;
-			Debug.Log($"World bounds - Min: {min}, Max: {max}");
+
+			var (min, max, avg, stdDev, p90, p95) = MapSceneController.Instance.CalculateStats(attribute);
+			Debug.Log($"Stats - Min: {min}, Max: {max}, Avg: {avg}, StdDev: {stdDev}, P90: {p90}, P95: {p95}");
+
+			float effectiveMax = p95 > 0 ? p95 : max;
+			heatmap.Intensity = 0.03f;
 
 			_points.Clear();
 			Vector4 point = Vector4.zero;
-			
-			(float min, float max, float average) Stats = MapSceneController.Instance.CalculateStats(attribute);
-			Debug.Log($"Stats for {attribute} - Min: {Stats.min}, Max: {Stats.max}, Average: {Stats.average}");
-			
-			float intensity = 0.545514f/ Stats.average;
-			Debug.Log($"Calculated intensity: {intensity}");
-			heatmap.Intensity = intensity; // Set to 100 for testing purposes
 
-			Debug.Log($"Processing {MapSceneController.Instance.InstantiatedPrefabs.Count} trees");
-			int treeCount = 0;
-        	foreach(GameObject Tree in MapSceneController.Instance.InstantiatedPrefabs){
-				if (Tree == null) {
-					Debug.LogWarning($"Found null tree at index {treeCount}");
-					continue;
-				}
-				if(!Tree.activeSelf) continue; // Skip inactive trees, when the user filters trees, they should not be included in the heatmap
-            	Vector3 position = Tree.transform.position;
-				var treeAttributes = Tree.GetComponent<TreeAttributes>();
-				if (treeAttributes == null) {
-					Debug.LogWarning($"Tree at position {position} has no TreeAttributes component");
-					continue;
-				}
+			int total = 0, included = 0;
+			foreach (var Tree in MapSceneController.Instance.InstantiatedPrefabs)
+			{
+				total++;
+				if (Tree == null || !Tree.activeSelf) continue;
 
-				float attributeValue = treeAttributes.GetValue(attribute);
-				Debug.Log($"Tree {treeCount} - Position: {position}, {attribute} value: {attributeValue}");
-            	point.Set(position.x, 0.0f, position.z, attributeValue);
+				var attr = Tree.GetComponent<TreeAttributes>();
+				if (attr == null) continue;
+
+				float value = attr.GetValue(attribute);
+				if (value <= 0f) continue;
+
+				float normalized = Mathf.InverseLerp(min, effectiveMax, value);
+				float curved = Mathf.Pow(normalized, 0.5f);
+
+				Vector3 pos = Tree.transform.position;
+				point.Set(pos.x, 0.0f, pos.z, curved);
 				_points.Add(point);
-				treeCount++;
-        	} 
-			
-			Debug.Log($"Final points count: {_points.Count}. Bounds check - First point: {_points[0]}, Last point: {_points[_points.Count - 1]}");
+				included++;
+			}
 
-
-
-
-			//Debug.Log("[HeatMap2D_Test] " + _points.Count + " points generated using Random method.");
+			Debug.Log($"Processed {total} trees. Included {included} in heatmap.");
 			_SetPoints();
 		}
+
+
+
 
 		public void _GenerateRandomPoints1()
 		{

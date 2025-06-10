@@ -97,7 +97,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &67512475529193807
 RectTransform:
   m_ObjectHideFlags: 0
@@ -343,8 +343,8 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_LocalScale: {x: 0.37, y: 0.37, z: 0.37}
+  m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 67512475529193807}
   m_Father: {fileID: 0}
@@ -480,6 +480,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   canvasPrefab: {fileID: 1305680401881084641, guid: a09ad12463cfdd4439af9be639ba7639, type: 3}
   panelInstance: {fileID: 0}
+  cameraTransform: {fileID: 0}
   everyAttribute: []
 --- !u!135 &6125643488240393542
 SphereCollider:
@@ -509,7 +510,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5199223814040775156}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7d9cf316373fc0f4ba5a85d89f94cc72, type: 3}
   m_Name: 

@@ -7,6 +7,9 @@ public class CreateNewAttributeMenu : MonoBehaviour
     public TMP_Dropdown firstAttributeDropdown;
     public TMP_Dropdown operationDropdown;
     public TMP_Dropdown secondAttributeDropdown;
+    public TMP_InputField inputFieldName;
+
+    public TMP_Text feedbackText;
 
     void Start()
     {
@@ -68,6 +71,8 @@ public class CreateNewAttributeMenu : MonoBehaviour
     {
         ExecuteExcelOperation();
         MapManager.Instance.SetAttributesToSheet(ExcelRepresentation.Instance.sheetIndex);
+        feedbackText.enabled = true;
+        feedbackText.text = "Correectly applied!";
     }
 
     public void ExecuteExcelOperation()
@@ -78,6 +83,6 @@ public class CreateNewAttributeMenu : MonoBehaviour
         string secondAttr = secondAttributeDropdown.options[secondAttributeDropdown.value].text;
 
         ExcelOperations excelOps = new ExcelOperations();
-        excelOps.CalculateAndWriteToExcel(filePath, firstAttr, operation, secondAttr);
+        excelOps.CalculateAndWriteToExcel(filePath, firstAttr, operation, secondAttr, inputFieldName.text);
     }
 }

@@ -6,7 +6,7 @@ using UnityEngine;
 
 public class ExcelOperations
 {
-    public void CalculateAndWriteToExcel(string filePath, string firstAttribute, string operation, string secondAttribute)
+    public void CalculateAndWriteToExcel(string filePath, string firstAttribute, string operation, string secondAttribute, string name)
 {
     IWorkbook workbook = null; // Inicializada explícitamente como null
     FileStream file = null;
@@ -18,7 +18,7 @@ public class ExcelOperations
             workbook = new XSSFWorkbook(file);
 
             // 2. Obtener hoja
-            ISheet sheet = workbook.GetSheetAt(0);
+            ISheet sheet = workbook.GetSheetAt(ExcelRepresentation.Instance.sheetIndex);
 
             // 3. Buscar columna vacía
             int emptyColumnIndex = FindFirstEmptyColumn(sheet);
@@ -29,7 +29,7 @@ public class ExcelOperations
             }
 
             // 4. Procesar datos
-            ProcessSheet(sheet, emptyColumnIndex, firstAttribute, operation, secondAttribute);
+            ProcessSheet(sheet, emptyColumnIndex, firstAttribute, operation, secondAttribute, name);
 
             // 5. Guardar cambios
             using (var writeFile = new FileStream(filePath, FileMode.Create, FileAccess.Write))
@@ -50,11 +50,11 @@ public class ExcelOperations
     }
 }
 
-    private void ProcessSheet(ISheet sheet, int emptyColumnIndex, string firstAttr, string operation, string secondAttr)
+    private void ProcessSheet(ISheet sheet, int emptyColumnIndex, string firstAttr, string operation, string secondAttr, string name)
     {
         // Crear header
         IRow headerRow = sheet.GetRow(0) ?? sheet.CreateRow(0);
-        headerRow.CreateCell(emptyColumnIndex).SetCellValue($"{firstAttr} {operation} {secondAttr}");
+        headerRow.CreateCell(emptyColumnIndex).SetCellValue(name);
 
         // Procesar filas
         for (int rowIndex = 1; rowIndex <= sheet.LastRowNum; rowIndex++)

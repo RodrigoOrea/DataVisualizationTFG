@@ -10,20 +10,41 @@ public class ProgressBar : MonoBehaviour
     public float currentValue = 50f;
 
     [Header("Referencias de UI")]
-    public GameObject fill; // Asigna aquí la imagen verde (el "fill")
+    public RectTransform fill; // Cambiado a RectTransform para mejor control
+    public RectTransform background; // Referencia al fondo
+    public RectTransform progressBarContainer; // Contenedor principal
 
     private TreeAttributes treeAttributes;
-
     public GameObject canvasProgress;
 
     void Awake()
     {
         treeAttributes = GetComponent<TreeAttributes>();
+        InitializeBar();
     }
 
     void Update()
     {
-        UpdateBar();
+        #if UNITY_EDITOR
+        // Solo en el editor, actualizar visualización cuando cambian valores
+        if (!Application.isPlaying)
+        {
+            UpdateBar();
+        }
+        #endif
+    }
+
+    void InitializeBar()
+    {
+        if (fill == null || background == null) return;
+        
+        // Configurar anclajes
+        fill.anchorMin = new Vector2(0, 0.5f);
+        fill.anchorMax = new Vector2(0, 0.5f);
+        fill.pivot = new Vector2(0, 0.5f);
+        
+        // Ajustar tamaño del fill para que coincida con el fondo
+        fill.sizeDelta = new Vector2(background.rect.width, background.rect.height);
     }
 
     public void UpdateProgressBar(string attribute, (float min, float max, float average) stats)
@@ -34,15 +55,12 @@ public class ProgressBar : MonoBehaviour
             return;
         }
 
-        // Obtener el valor del atributo del árbol
         float value = treeAttributes.GetValue(attribute);
         
-        // Actualizar los valores de la barra
         minValue = stats.min;
         maxValue = stats.max;
         currentValue = value;
 
-        // Actualizar la visualización
         UpdateBar();
         
         Debug.Log($"Progress bar updated - Attribute: {attribute}, Value: {value}, Min: {stats.min}, Max: {stats.max}");
@@ -50,22 +68,28 @@ public class ProgressBar : MonoBehaviour
 
     void UpdateBar()
     {
-        if (fill == null)
-        {
-            Debug.LogWarning("Fill object not assigned to ProgressBar");
-            return;
-        }
+        if (fill == null || background == null) return;
 
         float clampedValue = Mathf.Clamp(currentValue, minValue, maxValue);
-        float normalizedValue = (clampedValue - minValue) / (maxValue - minValue);
-        fill.transform.localScale = new Vector3(normalizedValue, 1, 1);
-    }    public void HideBar()
+        float normalizedValue = Mathf.Clamp01((clampedValue - minValue) / (maxValue - minValue));
+        
+        // Ajustar la escala manteniendo la proporción con el fondo
+        float scaleFactor = background.rect.width / fill.rect.width;
+        fill.localScale = new Vector3(normalizedValue * scaleFactor, 1, 1);
+        
+        // Asegurar posición correcta
+        fill.anchoredPosition = Vector2.zero;
+    }
+
+    public void HideBar()
     {
-        canvasProgress.SetActive(false);
+        if (canvasProgress != null)
+            canvasProgress.SetActive(false);
     }
 
     public void ShowBar()
     {
-        canvasProgress.SetActive(true);
+        if (canvasProgress != null)
+            canvasProgress.SetActive(true);
     }
 }

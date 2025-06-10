@@ -6437,6 +6437,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: '::'
   availablePrefabs:
   - {fileID: 5133708960582683292, guid: 4af5bdf7748ea044393554fda5cee170, type: 3}
+  - {fileID: 5199223814040775156, guid: c2ffdf3ed2599934abc74b1c173d074d, type: 3}
   representationDropdown: {fileID: 187325331}
 --- !u!1 &731772016
 GameObject:
@@ -8777,10 +8778,6 @@ PrefabInstance:
     m_TransformParent: {fileID: 1242858471}
     m_Modifications:
     - target: {fileID: 75684014313059708, guid: 288c5ddb9b5274d48b18df49a71122bd, type: 3}
-      propertyPath: m_Interactable
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 75684014313059708, guid: 288c5ddb9b5274d48b18df49a71122bd, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
       value: 3
       objectReference: {fileID: 0}
@@ -9124,7 +9121,7 @@ MonoBehaviour:
     m_PressedTrigger: Pressed
     m_SelectedTrigger: Selected
     m_DisabledTrigger: Disabled
-  m_Interactable: 0
+  m_Interactable: 1
   m_TargetGraphic: {fileID: 993245173}
   m_TextViewport: {fileID: 1615504921}
   m_TextComponent: {fileID: 154792458}
@@ -15237,7 +15234,7 @@ MonoBehaviour:
     m_PressedTrigger: Pressed
     m_SelectedTrigger: Selected
     m_DisabledTrigger: Disabled
-  m_Interactable: 0
+  m_Interactable: 1
   m_TargetGraphic: {fileID: 1866575224}
   m_OnClick:
     m_PersistentCalls:

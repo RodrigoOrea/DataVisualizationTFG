@@ -182,16 +182,47 @@ public class MapSceneController : MonoBehaviour
         }
     }
 
-    public (float min, float max, float avg) CalculateStats(string attributeName)
+    public (float min, float max, float avg, float stdDev, float p90, float p95) CalculateStats(string attributeName)
     {
-        var values = treeDataList
-            .Where(d => d.ContainsKey(attributeName))
-            .Select(d => float.TryParse(d[attributeName], out float val) ? val : (float?)null)
-            .Where(v => v.HasValue)
-            .Select(v => v.Value)
+        // Filtrar solo árboles activos y con el componente TreeAttributes
+        var activeTrees = InstantiatedPrefabs
+            .Where(tree => tree != null && tree.activeSelf)
+            .Select(tree => tree.GetComponent<TreeAttributes>())
+            .Where(attr => attr != null && attr.attributes.Any(kvp => kvp.Key == attributeName))
             .ToList();
 
-        return values.Count > 0 ? (values.Min(), values.Max(), values.Average()) : (0f, 0f, 0f);
+        // Extraer y convertir los valores del atributo
+        var values = activeTrees
+            .Select(attr => {
+                var attribute = attr.attributes.FirstOrDefault(kvp => kvp.Key == attributeName);
+                if (attribute.Key != null && float.TryParse(attribute.Value, 
+                    System.Globalization.NumberStyles.Float,
+                    System.Globalization.CultureInfo.InvariantCulture, 
+                    out float val))
+                {
+                    return (float?)val;
+                }
+                return null;
+            })
+            .Where(v => v.HasValue)
+            .Select(v => v.Value)
+            .OrderBy(v => v)
+            .ToList();
+
+        if (values.Count == 0) return (0f, 0f, 0f, 0f, 0f, 0f);
+
+        // Calcular estadísticas
+        float avg = values.Average();
+        float sumSq = values.Sum(v => (v - avg) * (v - avg));
+        float stdDev = Mathf.Sqrt(sumSq / values.Count);
+
+        // Calcular percentiles con protección contra índices fuera de rango
+        int p90Index = Mathf.Min(values.Count - 1, (int)(values.Count * 0.90f));
+        int p95Index = Mathf.Min(values.Count - 1, (int)(values.Count * 0.95f));
+        float p90 = values[p90Index];
+        float p95 = values[p95Index];
+
+        return (values.First(), values.Last(), avg, stdDev, p90, p95);
     }
 
     public void SetOriginAndCameraToSpawnIntersection()
