@@ -844,7 +844,7 @@ MonoBehaviour:
   _lookAction:
     m_UseReference: 0
     m_Action:
-      m_Name: 
+      m_Name: Look
       m_Type: 0
       m_ExpectedControlType: 
       m_Id: 626ce1f7-5243-4bd6-bcdc-98defa364d50
@@ -856,7 +856,7 @@ MonoBehaviour:
   _moveAction:
     m_UseReference: 0
     m_Action:
-      m_Name: 
+      m_Name: Move
       m_Type: 0
       m_ExpectedControlType: 
       m_Id: 98fb236a-9a63-43c5-a586-5316ca3e1df7
@@ -868,7 +868,7 @@ MonoBehaviour:
   _moveUpAction:
     m_UseReference: 0
     m_Action:
-      m_Name: 
+      m_Name: Move Up
       m_Type: 0
       m_ExpectedControlType: 
       m_Id: 832de37c-829a-4e27-8d83-29a6eeda52ad
@@ -880,7 +880,7 @@ MonoBehaviour:
   _speedChangeAction:
     m_UseReference: 0
     m_Action:
-      m_Name: 
+      m_Name: Speed Change
       m_Type: 0
       m_ExpectedControlType: 
       m_Id: a34eb1f0-54f2-4cbd-861f-c1445dd31bd1
@@ -892,7 +892,7 @@ MonoBehaviour:
   _speedResetAction:
     m_UseReference: 0
     m_Action:
-      m_Name: 
+      m_Name: Speed Reset
       m_Type: 0
       m_ExpectedControlType: 
       m_Id: cd8b277c-b838-4237-8cb2-4cd197788c8d
@@ -904,7 +904,7 @@ MonoBehaviour:
   _toggleDynamicSpeedAction:
     m_UseReference: 0
     m_Action:
-      m_Name: 
+      m_Name: Toggle Dynamic Speed
       m_Type: 0
       m_ExpectedControlType: 
       m_Id: 1c29fa44-a1eb-4446-b8fe-63d6761ace8b
@@ -1053,7 +1053,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 69d574919dd51c54abd6403cc1ee7031, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
-  scriptToToggle: {fileID: 510766465}
+  cameraController: {fileID: 510766465}
   feedbackText: {fileID: 929992383}
 --- !u!114 &575225810 stripped
 MonoBehaviour:
@@ -2706,6 +2706,10 @@ PrefabInstance:
       propertyPath: m_fontSizeBase
       value: 20
       objectReference: {fileID: 0}
+    - target: {fileID: 957494364007911597, guid: 92908097267291c4b80b976890a32182, type: 3}
+      propertyPath: m_overflowMode
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 1102464587641569457, guid: 92908097267291c4b80b976890a32182, type: 3}
       propertyPath: m_AnchorMax.y
       value: 1
@@ -2878,6 +2882,10 @@ PrefabInstance:
       propertyPath: m_fontSizeBase
       value: 20
       objectReference: {fileID: 0}
+    - target: {fileID: 2245395481236513028, guid: 92908097267291c4b80b976890a32182, type: 3}
+      propertyPath: m_overflowMode
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 2400312859011008376, guid: 92908097267291c4b80b976890a32182, type: 3}
       propertyPath: m_AnchoredPosition.x
       value: 322.61502
@@ -3041,6 +3049,10 @@ PrefabInstance:
     - target: {fileID: 3403509162507768533, guid: 92908097267291c4b80b976890a32182, type: 3}
       propertyPath: m_fontSizeBase
       value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 3403509162507768533, guid: 92908097267291c4b80b976890a32182, type: 3}
+      propertyPath: m_overflowMode
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3451205568502276151, guid: 92908097267291c4b80b976890a32182, type: 3}
       propertyPath: m_Horizontal
@@ -3262,6 +3274,10 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: -15
       objectReference: {fileID: 0}
+    - target: {fileID: 4104562887648539735, guid: 92908097267291c4b80b976890a32182, type: 3}
+      propertyPath: m_MatchWidthOrHeight
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4227247001529941134, guid: 92908097267291c4b80b976890a32182, type: 3}
       propertyPath: m_fontSize
       value: 20
@@ -3269,6 +3285,10 @@ PrefabInstance:
     - target: {fileID: 4227247001529941134, guid: 92908097267291c4b80b976890a32182, type: 3}
       propertyPath: m_fontSizeBase
       value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 4227247001529941134, guid: 92908097267291c4b80b976890a32182, type: 3}
+      propertyPath: m_overflowMode
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4409952668998536991, guid: 92908097267291c4b80b976890a32182, type: 3}
       propertyPath: m_AnchoredPosition.x

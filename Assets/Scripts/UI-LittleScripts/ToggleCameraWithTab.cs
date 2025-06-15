@@ -1,10 +1,11 @@
 using UnityEngine;
 using TMPro;
+using CesiumForUnity;
 
 public class ToggleScriptWithTab : MonoBehaviour
 {
     [Tooltip("Script que se activará/desactivará con Tab")]
-    public MonoBehaviour scriptToToggle; // El script que quieres controlar
+    public CesiumCameraController cameraController; // El script que quieres controlar
 
     public TMP_Text feedbackText;
 
@@ -12,11 +13,17 @@ public class ToggleScriptWithTab : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Tab))
         {
-            if (scriptToToggle != null)
+            if (cameraController != null)
             {
-                scriptToToggle.enabled = !scriptToToggle.enabled; // Alterna estado
-                Debug.Log(scriptToToggle.GetType().Name + " está ahora " +
-                         (scriptToToggle.enabled ? feedbackText.text= "Camera enabled" : feedbackText.text = "Camera disabled"));
+                cameraController.enableMovement = !cameraController.enableMovement;
+                cameraController.enableRotation = !cameraController.enableRotation;
+                // Cambia el texto de feedback correctamente
+                if (feedbackText != null)
+                {
+                    feedbackText.text = (cameraController.enableMovement || cameraController.enableRotation)
+                        ? "Camera enabled" : "Camera disabled";
+                }
+                Debug.Log(cameraController.GetType().Name + " está ahora " + (cameraController.enableMovement || cameraController.enableRotation ? "enabled" : "disabled"));
             }
             else
             {

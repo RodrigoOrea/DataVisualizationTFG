@@ -33,6 +33,16 @@ public class PauseManager : MonoBehaviour
 
     public void QuitGame()
     {
-        SceneManager.LoadScene("Menu");
+        string currentScene = SceneManager.GetActiveScene().name;
+        if (currentScene == "Menu")
+        {
+            MenuController.Instance.GoToMenu("Main Menu"); // Volver al menú
+        }
+        else
+        {
+            SceneManager.LoadScene("Menu"); // Volver al menú principal
+        }
+        gameObject.SetActive(false);
     }
+
 }

@@ -69,7 +69,7 @@ public class ExcelOperations
         }
     }
 
-    private int FindFirstEmptyColumn(ISheet sheet)
+    private static int FindFirstEmptyColumn(ISheet sheet)
     {
         IRow headerRow = sheet.GetRow(0);
         if (headerRow == null) return 0;

@@ -33,12 +33,6 @@ public class UIManager : MonoBehaviour
         if (Instance == null) Instance = this;
         else { Destroy(gameObject); return; }
 
-        treeDataList = ExcelRepresentation.Instance.attributes;
-
-        attributeKeys = (treeDataList != null && treeDataList.Count > 0)
-            ? new List<string>(treeDataList[0].Keys)
-            : new List<string>();
-
         PopulateDropdown();
         infoPanelTree.SetActive(true);
         attributeDropdown.onValueChanged.AddListener(OnAttributeSelected);
@@ -46,8 +40,13 @@ public class UIManager : MonoBehaviour
         SetCurrentSheetText();
     }
 
-    private void PopulateDropdown()
+    public void PopulateDropdown()
     {
+        treeDataList = ExcelRepresentation.Instance.attributes;
+
+        attributeKeys = (treeDataList != null && treeDataList.Count > 0)
+            ? new List<string>(treeDataList[0].Keys)
+            : new List<string>();
         attributeDropdown.ClearOptions();
         attributeDropdown.options.Add(new TMP_Dropdown.OptionData("No attribute"));
         attributeDropdown.AddOptions(attributeKeys);
@@ -139,12 +138,6 @@ public class UIManager : MonoBehaviour
         currentSheetText.text = ExcelRepresentation.Instance.getCurrentSheetString();
         UpdateMap();
 
-    }
-
-    public void OnCreateNewAttribute()
-    {
-        // Aquí puedes implementar la lógica para crear un nuevo atributo
-        Debug.Log("Crear nuevo atributo");
     }
 
     public void DisableAll()

@@ -66,6 +66,8 @@ public class MenuController : MonoBehaviour
         }
         errorColorText = Color.red;
         displayAndSetIfLastSelectedFileExists();
+
+        resolution.onValueChanged.AddListener(SetResolution);
     }
 
     private void Start()
@@ -100,20 +102,24 @@ public class MenuController : MonoBehaviour
 
     private void PopulateResolutionDropdown()
     {
-        resolution.ClearOptions();
-        int currentResolutionIndex = 0;
-        List<string> resolutionDescriptions = new List<string>();
-        for (int i = 0; i < resolutions.Length; i++)
-        {
-            string resolution = resolutions[i].width + " x " + resolutions[i].height;
-            resolutionDescriptions.Add(resolution);
-            if (IsActiveResolution(resolutions[i]))
-                currentResolutionIndex = i;
-        }
-        resolution.AddOptions(resolutionDescriptions);
-        resolution.value = currentResolutionIndex;
-        resolution.RefreshShownValue();
+    resolution.ClearOptions(); // Asumo que 'resolution' es un Dropdown o TMP_Dropdown
+    int currentResolutionIndex = 0;
+    List<string> resolutionDescriptions = new List<string>();
+
+    for (int i = 0; i < resolutions.Length; i++)
+    {
+        string description = resolutions[i].width + " x " + resolutions[i].height;
+        resolutionDescriptions.Add(description);
+
+        if (IsActiveResolution(resolutions[i]))
+            currentResolutionIndex = i;
     }
+
+    resolution.AddOptions(resolutionDescriptions);
+    resolution.value = currentResolutionIndex;
+    resolution.RefreshShownValue();
+    }
+
 
     private bool IsActiveResolution(Resolution resolution)
     {
@@ -126,11 +132,27 @@ public class MenuController : MonoBehaviour
 
     public void SetResolution(int resolutionIndex)
     {
-        if (resolutionIndex >= resolutions.Length)
-            resolutionIndex = resolutions.Length - 1;
-        Resolution resolution = resolutions[resolutionIndex];
-        Screen.SetResolution(resolution.width, resolution.height, Screen.fullScreen);
+        if (resolutions == null || resolutions.Length == 0)
+        {
+            Debug.LogWarning("No resolutions available.");
+            Debug.Log("Method called");
+            return;
+        }
+
+        if (resolutionIndex < 0 || resolutionIndex >= resolutions.Length)
+        {
+            Debug.LogWarning($"Invalid resolution index: {resolutionIndex}");
+            resolutionIndex = Mathf.Clamp(resolutionIndex, 0, resolutions.Length - 1);
+        }
+
+        Debug.Log("Method called");
+        Resolution selected = resolutions[resolutionIndex];
+        Screen.SetResolution(selected.width, selected.height, Screen.fullScreen);
+        Debug.Log($"Requested: {selected.width}x{selected.height}");
+        Debug.Log($"Game view actual: {Screen.width}x{Screen.height}");
+
     }
+
 
     public void QuitApplication()
     {
@@ -156,7 +178,6 @@ public class MenuController : MonoBehaviour
             MapConfiguration.Instance.setConfiguration();
 
             SceneManager.LoadScene("Mapa");
-            gameObject.SetActive(false);
             isCesium = true;
         }
         catch (Exception ex)

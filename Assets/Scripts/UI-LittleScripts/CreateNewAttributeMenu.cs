@@ -71,6 +71,7 @@ public class CreateNewAttributeMenu : MonoBehaviour
     {
         ExecuteExcelOperation();
         MapManager.Instance.SetAttributesToSheet(ExcelRepresentation.Instance.sheetIndex);
+        UIManager.Instance.PopulateDropdown();
         feedbackText.enabled = true;
         feedbackText.text = "Correectly applied!";
     }
