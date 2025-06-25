@@ -11,7 +11,6 @@ public class MenuController : MonoBehaviour
 {
     public static MenuController Instance { get; private set; }
     public TMP_Dropdown resolution;
-    public Toggle fullscreen;
     Resolution[] resolutions;
 
     [SerializeField] public TMP_InputField urlInputField;
@@ -25,8 +24,6 @@ public class MenuController : MonoBehaviour
     [SerializeField] private TMP_Text fileExcelText;
 
     public TMP_Text fileKMLText;
-
-    [SerializeField] private Button save;
 
     private Color normalColorText;
 
@@ -43,6 +40,8 @@ public class MenuController : MonoBehaviour
     public GameObject selectedRepresentation;
 
     public List<GameObject> menus = new List<GameObject>();
+
+    public Button startButton;
 
 
 
@@ -68,6 +67,9 @@ public class MenuController : MonoBehaviour
         displayAndSetIfLastSelectedFileExists();
 
         resolution.onValueChanged.AddListener(SetResolution);
+
+        startButton.onClick.AddListener(() => GoToMenu("Summary Menu"));
+
     }
 
     private void Start()
@@ -79,24 +81,6 @@ public class MenuController : MonoBehaviour
     private void Update()
     {
 
-    }
-
-
-
-    private void ChangeColorOnError(TMP_InputField control, bool error)
-    {
-        var colors = control.colors;
-        if (error)
-        {
-            colors.selectedColor = errorColorText;
-            colors.normalColor = errorColorText;
-        }
-        else
-        {
-            colors.selectedColor = normalColorText;
-            colors.normalColor = normalColorText;
-        }
-        control.colors = colors;
     }
 
 

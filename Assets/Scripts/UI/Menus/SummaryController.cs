@@ -27,13 +27,6 @@ public class SummaryController : MonoBehaviour
         CheckIfFileExists(KMLRepresentation.Instance.path, "KML");
         PopulateMatchLocationDropdown();
     }
-
-    // Update is called once per frame
-    void Update()
-    {
-
-    }
-
     private void PopulateSheets()
     {
         List<string> sheetNames = ExcelRepresentation.Instance.getSheetNames();
