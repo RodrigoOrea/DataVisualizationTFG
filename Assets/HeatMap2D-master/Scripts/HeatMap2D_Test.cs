@@ -31,7 +31,7 @@ namespace HeatMap2D
 
 		[Header("HeatMap2D Settings")]
 		public HeatMap2D heatmap;
-		[Range(0.01f, 15.0f)]
+		[Range(0.01f, 150.0f)]
 		[Tooltip("Points' radius")]
 		public float radius = 3.4f;
 		[Tooltip("Points' intensity")]
@@ -259,8 +259,18 @@ namespace HeatMap2D
 				float value = attr.GetValue(attribute);
 				if (value <= 0f) continue;
 
-				float normalized = Mathf.InverseLerp(min, effectiveMax, value);
-				float curved = Mathf.Pow(normalized, 0.5f);
+				float curved;
+
+				// ✅ Caso especial: todos los valores iguales
+				if (Mathf.Approximately(effectiveMax, min))
+				{
+					curved = 1.0f; // todos aportan igual
+				}
+				else
+				{
+					float normalized = Mathf.InverseLerp(min, effectiveMax, value);
+					curved = Mathf.Pow(normalized, 0.5f);
+				}
 
 				Vector3 pos = Tree.transform.position;
 				point.Set(pos.x, 0.0f, pos.z, curved);
@@ -271,6 +281,7 @@ namespace HeatMap2D
 			Debug.Log($"Processed {total} trees. Included {included} in heatmap.");
 			_SetPoints();
 		}
+
 
 
 

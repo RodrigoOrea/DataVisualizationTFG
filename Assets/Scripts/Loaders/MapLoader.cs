@@ -1,13 +1,8 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
-using NPOI.SS.UserModel;
-using NPOI.XSSF.UserModel;
 using System.Linq;
-using HeatMap2D;
-using System.Windows.Forms; //for List<float>.Min
 
 
 public class MapLoader : MonoBehaviour

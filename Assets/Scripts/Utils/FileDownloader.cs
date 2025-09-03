@@ -2,163 +2,142 @@ using System;
 using System.IO;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Threading;
 using System.Threading.Tasks;
-using Google.Apis.Auth.OAuth2;
-using Google.Apis.Drive.v3;
-using Google.Apis.Services;
 
-class FileDownloader
+public static class FileDownloader
 {
-
-    public static async Task Main(string[] args)
+    private static readonly HttpClient _httpClient = new HttpClient();
+    
+    static FileDownloader()
     {
-        string fileUrl = "https://example.com/sample.xlsx"; // Cambia por tu link
-        string downloadFolder = "downloads"; // Carpeta donde guardarás el archivo
-
-        try
-        {
-            // Crear el directorio si no existe
-            Directory.CreateDirectory(downloadFolder);
-
-            // Descargar el archivo y obtener el nombre
-            string downloadedFileName = await DownloadFileWithFileNameAsync(fileUrl, downloadFolder);
-
-            Console.WriteLine($"Archivo descargado: {downloadedFileName}");
-
-            // Verificar si es un archivo Excel
-            if (IsExcelFile(downloadedFileName))
-            {
-                Console.WriteLine("El archivo descargado es un archivo Excel.");
-            }
-            else
-            {
-                Console.WriteLine("El archivo descargado no es un archivo Excel.");
-            }
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error: {ex.Message}");
-        }
-    }
-    public static async Task<string> DownloadFileWithFileNameAsync(string url, string downloadFolder)
-    {
-        using (HttpClient client = new HttpClient())
-        {
-            HttpResponseMessage response = await client.GetAsync(url, HttpCompletionOption.ResponseHeadersRead);
-
-            if (!response.IsSuccessStatusCode)
-            {
-                throw new Exception($"No se pudo descargar el archivo. Código de estado: {response.StatusCode}");
-            }
-
-            // Obtener el nombre del archivo desde Content-Disposition
-            string fileName = GetFileNameFromContentDisposition(response.Content.Headers);
-
-            // Si no hay un nombre en los encabezados, intenta extraerlo de la URL
-            if (string.IsNullOrEmpty(fileName))
-            {
-                fileName = Path.GetFileName(new Uri(url).LocalPath);
-            }
-
-            // Ruta completa del archivo descargado
-            string filePath = Path.Combine(downloadFolder, fileName);
-
-            // Descargar y guardar el archivo
-            using (Stream contentStream = await response.Content.ReadAsStreamAsync(),
-                          fileStream = new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.None))
-            {
-                await contentStream.CopyToAsync(fileStream);
-            }
-
-            return filePath; // Devuelve la ruta completa del archivo descargado
-        }
+        // Configurar HttpClient una sola vez (mejor performance)
+        _httpClient.Timeout = TimeSpan.FromMinutes(5);
+        _httpClient.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64)");
     }
 
-    // Obtener el nombre del archivo desde el encabezado Content-Disposition
-    static string GetFileNameFromContentDisposition(HttpContentHeaders headers)
+    public static async Task<string> DownloadFileWithFileNameAsync(string url, string downloadFolder, 
+        CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrEmpty(url))
+            throw new ArgumentException("La URL no puede estar vacía", nameof(url));
+
+        if (string.IsNullOrEmpty(downloadFolder))
+            throw new ArgumentException("La carpeta de destino no puede estar vacía", nameof(downloadFolder));
+
+        // Validar que la URL sea válida
+        if (!Uri.TryCreate(url, UriKind.Absolute, out Uri uriResult) || 
+            !(uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps))
+        {
+            throw new ArgumentException("La URL no es válida", nameof(url));
+        }
+
+        HttpResponseMessage response = await _httpClient.GetAsync(url, 
+            HttpCompletionOption.ResponseHeadersRead, cancellationToken);
+
+        response.EnsureSuccessStatusCode();
+
+        // Obtener el nombre del archivo
+        string fileName = GetFileNameFromContentDisposition(response.Content.Headers) ?? 
+                         Path.GetFileName(uriResult.LocalPath);
+
+        // Si no se pudo determinar el nombre del archivo
+        if (string.IsNullOrEmpty(fileName))
+        {
+            fileName = $"downloaded_file_{DateTime.Now:yyyyMMddHHmmss}";
+        }
+
+        // Sanitizar nombre de archivo
+        fileName = SanitizeFileName(fileName);
+
+        // Crear directorio si no existe
+        Directory.CreateDirectory(downloadFolder);
+
+        // Ruta completa del archivo
+        string filePath = Path.Combine(downloadFolder, fileName);
+
+        // Descargar y guardar el archivo
+        using (Stream contentStream = await response.Content.ReadAsStreamAsync())
+        using (FileStream fileStream = new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.None))
+        {
+            await contentStream.CopyToAsync(fileStream, cancellationToken);
+        }
+
+        return filePath;
+    }
+
+    private static string GetFileNameFromContentDisposition(HttpContentHeaders headers)
     {
         if (headers.ContentDisposition != null)
         {
-            return headers.ContentDisposition.FileName?.Trim('"'); // Elimina las comillas alrededor del nombre del archivo
+            return headers.ContentDisposition.FileName?.Trim('"');
         }
         return null;
     }
 
-    // Método para verificar si el archivo es Excel
-    static bool IsExcelFile(string filePath)
+    private static string SanitizeFileName(string fileName)
     {
-        string[] validExcelMimeTypes = new string[]
-        {
-            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", // Excel moderno (xlsx)
-            "application/vnd.ms-excel" // Excel antiguo (xls)
-        };
+        if (string.IsNullOrEmpty(fileName))
+            return "downloaded_file";
 
-        using (FileStream fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read))
+        // Eliminar caracteres inválidos para nombres de archivo
+        char[] invalidChars = Path.GetInvalidFileNameChars();
+        foreach (char c in invalidChars)
         {
-            byte[] buffer = new byte[512];
-            fileStream.Read(buffer, 0, buffer.Length);
-
-            string mimeType = GetMimeType(buffer);
-            return Array.Exists(validExcelMimeTypes, mime => mime == mimeType);
+            fileName = fileName.Replace(c.ToString(), "_");
         }
+
+        // Limitar longitud del nombre
+        if (fileName.Length > 100)
+        {
+            string extension = Path.GetExtension(fileName);
+            string nameWithoutExtension = Path.GetFileNameWithoutExtension(fileName);
+            nameWithoutExtension = nameWithoutExtension.Substring(0, Math.Min(100 - extension.Length, nameWithoutExtension.Length));
+            fileName = nameWithoutExtension + extension;
+        }
+
+        return fileName;
     }
 
-    static string GetMimeType(byte[] fileHeader)
+    public static bool IsExcelFile(string filePath)
     {
-        if (fileHeader.Length < 512)
-            return string.Empty;
+        if (string.IsNullOrEmpty(filePath) || !File.Exists(filePath))
+            return false;
 
-        if (fileHeader[0] == 0x50 && fileHeader[1] == 0x4B && fileHeader[2] == 0x03 && fileHeader[3] == 0x04)
+        try
         {
-            return "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
-        }
-        else if (fileHeader[0] == 0xD0 && fileHeader[1] == 0xCF && fileHeader[2] == 0x11 && fileHeader[3] == 0xE0)
-        {
-            return "application/vnd.ms-excel";
-        }
+            string[] validExcelExtensions = new string[] { ".xlsx", ".xls" };
+            string extension = Path.GetExtension(filePath).ToLowerInvariant();
+            
+            // Primera validación rápida por extensión
+            if (Array.IndexOf(validExcelExtensions, extension) == -1)
+                return false;
 
-        return string.Empty;
-    }
-
-    public static async Task DownloadFileAsyncDrive(string fileId, string outputPath, string credentialsPath)
-    {
-        // 1. Autenticación: Carga credenciales
-        GoogleCredential credential;
-        using (var stream = new FileStream(credentialsPath, FileMode.Open, FileAccess.Read))
-        {
-            credential = GoogleCredential.FromStream(stream)
-                .CreateScoped(DriveService.Scope.DriveReadonly);
-        }
-
-        // 2. Crear el servicio de Drive
-        var service = new DriveService(new BaseClientService.Initializer()
-        {
-            HttpClientInitializer = credential,
-            ApplicationName = "MyDriveDownloader",
-        });
-
-        // 3. Obtener metadatos del archivo (opcional, para saber el nombre, mimeType, etc.)
-        var fileMetadata = await service.Files.Get(fileId).ExecuteAsync();
-
-        // 4. Preparar la solicitud de descarga
-        var request = service.Files.Get(fileId);
-        
-        // 5. Descargar en un stream
-        using (var memoryStream = new MemoryStream())
-        {
-            await request.DownloadAsync(memoryStream);
-
-            // 6. Guardar en disco
-            using (var fileStream = new FileStream(outputPath, FileMode.Create, FileAccess.Write))
+            // Validación más robusta leyendo la firma del archivo
+            using (FileStream fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read))
             {
-                memoryStream.Seek(0, SeekOrigin.Begin);
-                await memoryStream.CopyToAsync(fileStream);
-            }
-        }
+                byte[] buffer = new byte[8]; // Solo necesitamos los primeros bytes
+                int bytesRead = fileStream.Read(buffer, 0, buffer.Length);
 
-        // Como "fileMetadata" tienes:
-        // fileMetadata.Name: nombre del archivo en Drive
-        // fileMetadata.MimeType: MIME type
-        // fileMetadata.Size: tamaño
+                // Firma de archivos Excel (xlsx son ZIP, xls tiene firma específica)
+                if (bytesRead >= 4)
+                {
+                    // XLSX: PK header (ZIP file)
+                    if (buffer[0] == 0x50 && buffer[1] == 0x4B && buffer[2] == 0x03 && buffer[3] == 0x04)
+                        return true;
+
+                    // XLS: D0 CF 11 E0
+                    if (buffer[0] == 0xD0 && buffer[1] == 0xCF && buffer[2] == 0x11 && buffer[3] == 0xE0)
+                        return true;
+                }
+            }
+
+            return false;
+        }
+        catch
+        {
+            // Si hay error al leer el archivo, asumimos que no es Excel válido
+            return false;
+        }
     }
 }

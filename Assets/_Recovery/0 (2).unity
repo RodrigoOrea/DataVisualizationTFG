@@ -1993,6 +1993,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: '::'
   kmlFileNameText: {fileID: 1280337039}
   excelFilePathText: {fileID: 91703242}
+  sheetDropdown: {fileID: 0}
+  matchLocationDropdown: {fileID: 0}
 --- !u!1 &187325328
 GameObject:
   m_ObjectHideFlags: 0
@@ -13269,6 +13271,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: '::'
   tooltipText: {fileID: 1865908086}
   tooltipObject: {fileID: 1865908083}
+  offset: {x: 15, y: -15}
 --- !u!114 &1865908086
 MonoBehaviour:
   m_ObjectHideFlags: 0

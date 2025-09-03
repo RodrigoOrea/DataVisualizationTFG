@@ -1,7 +1,5 @@
 using UnityEngine;
 using TMPro;
-using UnityEngine.UI;
-using System.Windows.Forms;
 using Button = UnityEngine.UI.Button;
 using UnityEngine.SceneManagement;
 

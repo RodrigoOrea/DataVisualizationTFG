@@ -26,9 +26,6 @@ public class GroupStatisticsMenu : SingletonMonoBehavior<GroupStatisticsMenu>, I
 
     private void Start()
     {
-        addFilterButton.onClick.AddListener(AddNewFilter);
-        applyFiltersButton.onClick.AddListener(PopulateTable);
-        AddNewFilter(); // Añadir un filtro por defecto al inicio
     }
 
     private void AddNewFilter()
@@ -42,8 +39,8 @@ public class GroupStatisticsMenu : SingletonMonoBehavior<GroupStatisticsMenu>, I
     }
     public void PopulateTable()
     {
-        gameObject.SetActive(false);
-        statisticsMenu.SetActive(true);
+        //gameObject.SetActive(false);
+        //statisticsMenu.SetActive(true);
 
         // Obtener los árboles que pasan los filtros
         var stats = CalculateStats(MapSceneController.Instance.InstantiatedPrefabs);
@@ -83,14 +80,7 @@ public class GroupStatisticsMenu : SingletonMonoBehavior<GroupStatisticsMenu>, I
 
     void Update()
     {
-        if (instantiatedFilterElements != filterCriteriaList.Count)
-        {
-            applyFiltersButton.interactable = false;
-        }
-        else
-        {
-            applyFiltersButton.interactable = true;
-        }
+        //
     }
 
     public List<GameObject> GetTreesThatPassFilters(List<FilterCriteria> filters)

@@ -7353,6 +7353,8 @@ MonoBehaviour:
   firstAttributeDropdown: {fileID: 4425957766351725466}
   operationDropdown: {fileID: 3401958115789904921}
   secondAttributeDropdown: {fileID: 1767512427620735174}
+  inputFieldName: {fileID: 0}
+  feedbackText: {fileID: 0}
 --- !u!1 &7415039845414104612
 GameObject:
   m_ObjectHideFlags: 0

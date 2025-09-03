@@ -113,6 +113,30 @@ namespace HeatMap2D
 		/// </summary>
 		public void SetPoints(List<Vector4> points)
 		{
+			Debug.Log($"[HeatMap2D] SetPoints called with {points.Count} points");
+    
+    // Verificar si todos los puntos están en la misma posición
+    if (points.Count > 1)
+    {
+        Vector4 firstPointy = points[0];
+        bool allSamePosition = true;
+        
+        for (int i = 1; i < Mathf.Min(points.Count, 10); i++) // Revisar solo los primeros 10
+        {
+            float distance = Vector3.Distance(firstPointy, points[i]);
+            Debug.Log($"[HeatMap2D] Point {i}: {points[i]}, Distance to first: {distance:F6}");
+            
+            if (distance > 0.001f) // Más de 1mm de diferencia
+            {
+                allSamePosition = false;
+            }
+        }
+        
+        if (allSamePosition)
+        {
+            Debug.LogWarning("[HeatMap2D] ¡TODOS los puntos están en la misma posición!");
+        }
+    }
 			Debug.Log($"[HeatMap2D] SetPoints called with {(points == null ? "null" : points.Count.ToString())} points");
 
 			if ((points == null) || (points.Count == 0))

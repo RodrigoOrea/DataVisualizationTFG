@@ -6,6 +6,8 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using SFB;
+using System.Net.Http;
+using System.Threading.Tasks;
 
 public class MenuController : MonoBehaviour
 {
@@ -41,7 +43,6 @@ public class MenuController : MonoBehaviour
 
     public List<GameObject> menus = new List<GameObject>();
 
-    public Button startButton;
 
 
 
@@ -67,8 +68,6 @@ public class MenuController : MonoBehaviour
         displayAndSetIfLastSelectedFileExists();
 
         resolution.onValueChanged.AddListener(SetResolution);
-
-        startButton.onClick.AddListener(() => GoToMenu("Summary Menu"));
 
     }
 
@@ -140,7 +139,12 @@ public class MenuController : MonoBehaviour
 
     public void QuitApplication()
     {
+        Debug.Log("[OptionsMenu] Saliendo de la aplicación...");
+    #if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+    #else
         Application.Quit();
+    #endif
     }
 
     public void SetFullscreen(bool fullscreen)
@@ -233,36 +237,68 @@ public class MenuController : MonoBehaviour
     }
     //inspector
     public async void SelectURLExcelFile()
+{
+    string url = urlInputField.text.Trim();
+
+    if (string.IsNullOrEmpty(url))
     {
-        string url = urlInputField.text.Trim();
+        Debug.LogWarning("La URL está vacía.");
+        return;
+    }
 
-        if (string.IsNullOrEmpty(url))
-        {
-            Debug.LogWarning("La URL está vacía.");
-            return;
-        }
+    try
+    {
+        // Mostrar estado de carga (si tienes UI para esto)
+        SetLoadingState(true);
 
-        try
+        string downloadedFilePath = await FileDownloader.DownloadFileWithFileNameAsync(url, "./");
+        
+        if (!string.IsNullOrEmpty(downloadedFilePath))
         {
-            string downloadedFilePath = await FileDownloader.DownloadFileWithFileNameAsync(url, "./");
-            if (!string.IsNullOrEmpty(downloadedFilePath))
+            // Validar que sea un archivo Excel
+            if (!FileDownloader.IsExcelFile(downloadedFilePath))
             {
-                fileExcelPath = downloadedFilePath;
-                ExcelRepresentation.Instance.setExcel(fileExcelPath);
-                fileExcelText.color = Color.black;
-                fileExcelText.text = ExcelRepresentation.Instance.getFileString();
-                Debug.Log("Archivo Excel descargado desde URL: " + fileExcelPath);
+                Debug.LogWarning("El archivo descargado no es un archivo Excel válido.");
+                File.Delete(downloadedFilePath); // Limpiar archivo no válido
+                return;
             }
-            else
-            {
-                Debug.LogWarning("La descarga no produjo un archivo válido.");
-            }
+
+            fileExcelPath = downloadedFilePath;
+            ExcelRepresentation.Instance.setExcel(fileExcelPath);
+            fileExcelText.color = Color.black;
+            fileExcelText.text = ExcelRepresentation.Instance.getFileString();
+            Debug.Log("Archivo Excel descargado desde URL: " + fileExcelPath);
         }
-        catch (Exception ex)
+        else
         {
-            Debug.LogError("Error al descargar el archivo Excel desde la URL: " + ex.Message);
+            Debug.LogWarning("La descarga no produjo un archivo válido.");
         }
     }
+    catch (HttpRequestException ex)
+    {
+        Debug.LogError($"Error de red al descargar el archivo: {ex.Message}");
+    }
+    catch (TaskCanceledException)
+    {
+        Debug.LogWarning("La descarga fue cancelada por timeout.");
+    }
+    catch (Exception ex)
+    {
+        Debug.LogError($"Error al descargar el archivo Excel desde la URL: {ex.Message}");
+    }
+    finally
+    {
+        // Ocultar estado de carga
+        SetLoadingState(false);
+    }
+}
+
+// Método auxiliar para UI (si es necesario)
+private void SetLoadingState(bool isLoading)
+{
+    // Implementar lógica para mostrar/ocultar indicador de carga
+    // Ejemplo: loadingIndicator.SetActive(isLoading);
+}
 
     //inspector
     public void SelectLocalKMLFile()

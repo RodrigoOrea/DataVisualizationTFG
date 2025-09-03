@@ -567,6 +567,8 @@ MonoBehaviour:
   maxValue: 100
   currentValue: 50
   fill: {fileID: 4143134808746488169}
+  background: {fileID: 0}
+  progressBarContainer: {fileID: 0}
   canvasProgress: {fileID: 2932176598409328501}
 --- !u!114 &-6135535896566389382
 MonoBehaviour:

@@ -1,6 +1,8 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using UnityEngine.Rendering;
+using UnityEngine.Rendering.Universal;
 
 public class OptionsMenu : MonoBehaviour
 {
@@ -14,19 +16,61 @@ public class OptionsMenu : MonoBehaviour
     public Slider contrastSlider;
 
     [Header("Post Processing")]
-    public Material postProcessMaterial; // Usa un material con shader que modifique brillo/contraste
+    public Volume globalVolume;// Usa un material con shader que modifique brillo/contraste
+
+    private ColorAdjustments colorAdjustments;
+
+    public Toggle fullscreenToggle;
+
+    [SerializeField] private float minExposure = -2f;
+    [SerializeField] private float maxExposure = 2f;
+
+    private void Awake()
+    {
+        if (globalVolume == null)
+        {
+            Debug.LogError("[OptionsMenu] ⚠️ No hay Volume asignado en el inspector.");
+            return;
+        }
+
+        bool found = globalVolume.profile.TryGet(out colorAdjustments);
+        if (!found)
+        {
+            Debug.LogError("[OptionsMenu] ❌ No se encontró Color Adjustments en el Volume Profile.");
+        }
+        else
+        {
+            Debug.Log("[OptionsMenu] ✅ Color Adjustments detectado correctamente.");
+        }
+    }
 
     private void Start()
     {
+
+        // Inicializa el toggle según el estado actual de la pantalla
+        fullscreenToggle.isOn = Screen.fullScreen;
+
+        // Conecta el listener
+        fullscreenToggle.onValueChanged.AddListener(SetFullscreen);
+        
         SetupQualityOptions();
-        SetupVSyncOptions();
-        SetupLODOptions();
+        //SetupVSyncOptions();
+        //SetupLODOptions();
 
         brightnessSlider.onValueChanged.AddListener(SetBrightness);
-        contrastSlider.onValueChanged.AddListener(SetContrast);
+        //contrastSlider.onValueChanged.AddListener(SetContrast);
+
+        Debug.Log("[OptionsMenu] ✅ Listeners de sliders conectados.");
 
         LoadSettings();
     }
+
+    private void SetFullscreen(bool isFullscreen)
+    {
+        Screen.fullScreen = isFullscreen;
+        Debug.Log("[OptionsMenu] Fullscreen: " + isFullscreen);
+    }
+
 
     // ---------------- CALIDAD ----------------
     private void SetupQualityOptions()
@@ -81,28 +125,46 @@ public class OptionsMenu : MonoBehaviour
     // ---------------- BRILLO Y CONTRASTE ----------------
     public void SetBrightness(float value)
     {
-        if (postProcessMaterial != null)
-            postProcessMaterial.SetFloat("_Brightness", value);
+        if (colorAdjustments == null)
+        {
+            Debug.LogWarning("[OptionsMenu] ⚠️ ColorAdjustments es NULL, no se aplica brillo.");
+            return;
+        }
+
+        // Normalizamos el valor del slider a 0–1
+        float normalized = Mathf.InverseLerp(brightnessSlider.minValue, brightnessSlider.maxValue, value);
+
+        // Mapeamos al rango real de exposición
+        float mapped = Mathf.Lerp(minExposure, maxExposure, normalized);
+
+        // Aplicamos el brillo
+        colorAdjustments.postExposure.value = mapped;
+
+        Debug.Log($"[OptionsMenu] Brillo Slider: {value} → Brillo aplicado: {mapped}");
     }
+    
 
     public void SetContrast(float value)
     {
-        if (postProcessMaterial != null)
-            postProcessMaterial.SetFloat("_Contrast", value);
-    }
-
-
-    public void ToggleFullscreen()
-    {
-        Screen.fullScreen = !Screen.fullScreen;
+        Debug.Log($"[OptionsMenu] Contraste Slider: {value}");
+        if (colorAdjustments != null)
+        {
+            float mapped = Mathf.Lerp(-50f, 50f, value);
+            colorAdjustments.contrast.value = mapped;
+            Debug.Log($"[OptionsMenu] → Contraste aplicado: {mapped}");
+        }
+        else
+        {
+            Debug.LogWarning("[OptionsMenu] ⚠️ ColorAdjustments es NULL, no se aplica contraste.");
+        }
     }
 
 
     // ---------------- PERSISTENCIA OPCIONAL ----------------
     private void LoadSettings()
     {
-        brightnessSlider.value = PlayerPrefs.GetFloat("Brightness", 1f);
-        contrastSlider.value = PlayerPrefs.GetFloat("Contrast", 1f);
+        brightnessSlider.value = PlayerPrefs.GetFloat("Brightness", 0f);
+        contrastSlider.value = PlayerPrefs.GetFloat("Contrast", 0f);
         SetBrightness(brightnessSlider.value);
         SetContrast(contrastSlider.value);
     }

@@ -255,18 +255,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   infoPanelTree: {fileID: 4536132820475591787}
-  treeAttibutes: {fileID: 0}
   attributeDropdown: {fileID: 5742103954380969936}
-  panelRectTransform: {fileID: 0}
   barCanvas: {fileID: 0}
-  minText: {fileID: 0}
-  avgText: {fileID: 0}
-  maxText: {fileID: 0}
   heatmap: {fileID: 0}
   heatmapToggle: {fileID: 6734655731633876250}
   treeColorToggle: {fileID: 4796038082560818110}
   progressBarToggle: {fileID: 3267214395211954218}
-  showAllTreesToggle: {fileID: 0}
   selectedAttributeBoolean: 0
   selectedAttributeString: 
   overviewCamera: {fileID: 0}
@@ -2459,8 +2453,9 @@ MonoBehaviour:
   filterPrefab: {fileID: 6172644934640865573, guid: 2be0b8a76398f6f4daaa1884bcf826e1, type: 3}
   addFilterButton: {fileID: 6896386043807916323}
   applyFiltersButton: {fileID: 8901675909558150868}
+  feedbackText: {fileID: 0}
   lastFilter: {fileID: 6767685858292534594}
-  instantiatedFilterElements: 1
+  instantiatedFilterElementsList: []
 --- !u!1 &3984092889789389666
 GameObject:
   m_ObjectHideFlags: 0
