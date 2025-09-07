@@ -1,4 +1,5 @@
 using Assimp;
+using Ookii.Dialogs;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -6,6 +7,11 @@ public class PauseManager : MonoBehaviour
 {
     public GameObject pauseMenu;
     private bool isPaused = false;
+
+    void Start()
+    {
+        DontDestroyOnLoad(gameObject);
+    }
 
     void Update()
     {
@@ -42,7 +48,7 @@ public class PauseManager : MonoBehaviour
         {
             SceneManager.LoadScene("Menu"); // Volver al menú principal
         }
-        gameObject.SetActive(false);
+        pauseMenu.SetActive(false);
     }
 
 }

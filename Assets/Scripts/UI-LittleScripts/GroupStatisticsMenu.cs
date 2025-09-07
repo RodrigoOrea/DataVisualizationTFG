@@ -5,7 +5,7 @@ using TMPro;
 using System.Text.RegularExpressions;
 using System.Linq;
 
-public class GroupStatisticsMenu : SingletonMonoBehavior<GroupStatisticsMenu>, IFilterHandler
+public class GroupStatisticsMenu :MonoBehaviour, IFilterHandler
 {
     [SerializeField] private Transform filterContainer;      // Contenedor con Vertical Layout
     [SerializeField] private GameObject filterPrefab;        // Prefab de filtro (dropdown + input + delete)

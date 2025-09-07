@@ -28,7 +28,7 @@ public class PanelAboveTree : MonoBehaviour
         {
             SphereCollider sphereCollider = GetComponent<SphereCollider>();
             float height = sphereCollider.bounds.center.y + (sphereCollider.radius * transform.lossyScale.y);
-            Vector3 offset = new Vector3(0, height + 50f, 0);
+            Vector3 offset = new Vector3(0, height + 2.5f, 0);
             panelInstance = Instantiate(canvasPrefab, transform.position + offset, Quaternion.identity, transform);
             panelInstance.GetComponent<RectTransform>().localScale = new Vector3(0.25f, 0.25f, 0.25f);
             panelText = panelInstance.GetComponentInChildren<TMP_Text>();

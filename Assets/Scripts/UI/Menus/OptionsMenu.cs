@@ -13,7 +13,6 @@ public class OptionsMenu : MonoBehaviour
 
     [Header("Sliders")]
     public Slider brightnessSlider;
-    public Slider contrastSlider;
 
     [Header("Post Processing")]
     public Volume globalVolume;// Usa un material con shader que modifique brillo/contraste
@@ -164,15 +163,12 @@ public class OptionsMenu : MonoBehaviour
     private void LoadSettings()
     {
         brightnessSlider.value = PlayerPrefs.GetFloat("Brightness", 0f);
-        contrastSlider.value = PlayerPrefs.GetFloat("Contrast", 0f);
         SetBrightness(brightnessSlider.value);
-        SetContrast(contrastSlider.value);
     }
 
     public void SaveSettings()
     {
         PlayerPrefs.SetFloat("Brightness", brightnessSlider.value);
-        PlayerPrefs.SetFloat("Contrast", contrastSlider.value);
         PlayerPrefs.Save();
     }
     

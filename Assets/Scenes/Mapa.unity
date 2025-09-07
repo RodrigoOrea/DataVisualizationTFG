@@ -2518,11 +2518,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6567046119576467416, guid: d8eb7b6f9a77eac4b836ef2d39a9e3f0, type: 3}
       propertyPath: radius
-      value: 11.5
+      value: 150
       objectReference: {fileID: 0}
     - target: {fileID: 6567046119576467416, guid: d8eb7b6f9a77eac4b836ef2d39a9e3f0, type: 3}
       propertyPath: intensity
-      value: 0.03
+      value: 0.37
       objectReference: {fileID: 0}
     - target: {fileID: 6567046119576467416, guid: d8eb7b6f9a77eac4b836ef2d39a9e3f0, type: 3}
       propertyPath: m_Enabled
