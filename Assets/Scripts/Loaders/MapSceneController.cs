@@ -29,7 +29,7 @@ public class MapSceneController : MonoBehaviour
 
 
 
-    private void Awake()
+     private void Awake()
     {
         // Singleton setup
         if (Instance == null) Instance = this;
@@ -37,13 +37,9 @@ public class MapSceneController : MonoBehaviour
 
         InstantiatedPrefabs = new List<GameObject>();
 
-        // Georeference setup
+        // Georeference setup (ahora en coroutine)
         cesiumRef = cesiumGeoreference.GetComponent<CesiumGeoreference>();
-        double[] coords = MapConfiguration.coordsSpawnEFEC;
-        cesiumRef.SetOriginEarthCenteredEarthFixed(coords[0], coords[1], coords[2] + 500);
-        cesiumRef.MoveOrigin();
-        Camera.main.transform.localPosition = Vector3.zero;
-
+        StartCoroutine(SetupCesiumOriginAndCamera());
 
         // Load tree data
         treeDataList = ExcelRepresentation.Instance.attributes;
@@ -71,6 +67,27 @@ public class MapSceneController : MonoBehaviour
         treePrefab = MenuController.Instance.selectedRepresentation;
 
         InstantiateAllTrees();
+    }
+
+    /// <summary>
+    /// Separa la lógica de setup del Cesium para evitar problemas de timing.
+    /// </summary>
+    private IEnumerator SetupCesiumOriginAndCamera()
+    {
+        double[] coords = MapConfiguration.coordsSpawnEFEC;
+
+        cesiumRef.SetOriginEarthCenteredEarthFixed(coords[0], coords[1], coords[2] + 500);
+        cesiumRef.MoveOrigin();
+
+        // Esperar un frame para que Cesium actualice internamente
+        yield return null;
+
+        // Ahora sí colocar la cámara en posición local 0,0,0
+        if (Camera.main != null)
+        {
+            Camera.main.transform.localPosition = Vector3.zero;
+            Camera.main.transform.localRotation = Quaternion.identity;
+        }
     }
 
     private void InstantiateAllTrees()

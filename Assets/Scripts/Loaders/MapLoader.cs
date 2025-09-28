@@ -16,9 +16,6 @@ public class MapLoader : MonoBehaviour
     [SerializeField] GameObject[] instantiablePrefabs;
 
     public List<GameObject> instantiatedPrefabs;
-
-    private InfoCollection objects;
-    private TextureLoader textureLoader;
     private Dictionary<string, GameObject> prefabs;
     private Dictionary<string, GameObject> spawners;
 
@@ -37,11 +34,9 @@ public class MapLoader : MonoBehaviour
         Instance = this;
         treeDataList = ExcelReader.ReadExcelData(MenuController.Instance.fileExcelPath, MenuController.Instance.excelSheetIndex);
         GenerateRandomMap(treeDataList);
-        textureLoader = new TextureLoader();
         spawners = new Dictionary<string, GameObject>();
         prefabs = PopulateInstantiablePrefabs(instantiablePrefabs);
         //objects = LoadMapFileInfo(mapFileName, configFileName);
-        PlaceLightsAndObjects(objects, prefabs);
         //LoadExcelData();
         //AssignAttributesToObjects();
         // Debug.Log("Texture image time in millis: " + textureLoader.GetTextureLoadTimeMillis());
@@ -122,24 +117,6 @@ public class MapLoader : MonoBehaviour
         }
     }*/
 
-    private void InstantiateSymbol(Dictionary<string, SymbolPrefabPair> symbolToPrefabMapping, char symbol, Vector3 pos, ref int spawnerCounter) {
-        ObjectInfo instantiable = new ObjectInfo {
-            active = true,
-            position = pos,
-            objectPrefabName = symbolToPrefabMapping[symbol.ToString()].prefabName,
-            objectName = symbolToPrefabMapping[symbol.ToString()].prefabName,
-            dataFolder = symbolToPrefabMapping[symbol.ToString()].dataFolder,
-        };
-        if (instantiable.objectPrefabName.Equals("Spawner"))
-            instantiable.objectName += " " + ++spawnerCounter;
-        PlaceObject(instantiable, prefabs);
-    }
-
-    private void PlaceLightsAndObjects(InfoCollection infoCollection, Dictionary<string, GameObject> prefabs) {
-        PlaceLights(infoCollection.lights, prefabs);
-        PlaceObjects(infoCollection.objects, prefabs);
-    }
-
     private void PlaceLights(LightInfo[] lights, Dictionary<string, GameObject> prefabs) {
         foreach (LightInfo light in lights) {
             if (light.active) {
@@ -157,46 +134,6 @@ public class MapLoader : MonoBehaviour
         }
     }
 
-    private void PlaceObjects(ObjectInfo[] objects, Dictionary<string, GameObject> prefabs) {
-        int i = 0;
-        foreach (ObjectInfo obj in objects)
-            PlaceObject(obj, prefabs);
-            i++;
-    }
-
-
-    private void PlaceObject(ObjectInfo objectInfo, Dictionary<string, GameObject> prefabs) {
-        int i = UnityEngine.Random.Range(1,40);
-        if (objectInfo.active) {
-            objectInfo.comRadio=4.0; //Luego vendrá de fichero map.json
-            var objInstance = Instantiate(
-                    prefabs[objectInfo.objectPrefabName],
-                    objectInfo.position,
-                    Quaternion.identity
-            );
-            objInstance.transform.Rotate(objectInfo.rotation.x, objectInfo.rotation.y, objectInfo.rotation.z, Space.Self);
-            objInstance.name = objectInfo.objectName;
-            instantiatedPrefabs.Add(objInstance);
-
-            var treeAttributes = objInstance.GetComponent<TreeAttributes>();
-            if (treeAttributes != null) {
-                    treeAttributes.SetAttributes(treeDataList[i]);
-                    treeAttributes.SetPrefab(objInstance);
-            }
-            if (!string.IsNullOrEmpty(objectInfo.dataFolder)) {
-                try {
-                    var changeTexture = objInstance.GetComponent<ChangeTexture>();
-                    var textures = textureLoader.GetTextures(objectInfo.dataFolder);
-                    changeTexture.ApplyRandomTextures(textures);
-                } catch (NullReferenceException) {
-                    Debug.LogError(objectInfo.objectName + " (" + objectInfo.objectPrefabName + ") ChangeTexture component is missing.");
-                }
-            }
-            
-            if (objectInfo.objectPrefabName == "Spawner")
-                spawners.Add(objInstance.name, objInstance);
-        }
-    }
 
     private InfoCollection ReadMapFile(string filename) {
         string json = File.ReadAllText(filename);
